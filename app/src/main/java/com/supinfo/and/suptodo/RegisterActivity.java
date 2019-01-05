@@ -49,7 +49,7 @@ public class RegisterActivity extends AppCompatActivity {
     }
 
     public void validateFields(String userName, String firstName, String lastName, String email, String password){
-        if((userName.isEmpty())|| (firstName.isEmpty()) || (lastName.isEmpty()) || (email.isEmpty()) || (password.isEmpty())){
+        if((userName.trim().isEmpty())|| (firstName.trim().isEmpty()) || (lastName.trim().isEmpty()) || (email.trim().isEmpty()) || (password.isEmpty())){
             Toast.makeText(getApplicationContext(),"Incomplete form",Toast.LENGTH_LONG).show();
 
         }else{

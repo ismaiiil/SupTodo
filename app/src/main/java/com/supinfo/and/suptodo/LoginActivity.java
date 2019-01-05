@@ -38,7 +38,7 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     public void validateFields(String userNameLog, String passwordLog){
-        if((userNameLog.isEmpty())|| (passwordLog.isEmpty())){
+        if((userNameLog.trim().isEmpty())|| (passwordLog.trim().isEmpty())){
             Toast.makeText(getApplicationContext(),"You cannot leave empty fields",Toast.LENGTH_LONG).show();
 
         }else{
