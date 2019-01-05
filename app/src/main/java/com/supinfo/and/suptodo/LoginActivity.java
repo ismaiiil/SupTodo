@@ -52,7 +52,7 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     public void validateFields(String userNameLog, String passwordLog){
-        if((userNameLog.isEmpty())|| (passwordLog.isEmpty())){
+        if((userNameLog.trim().isEmpty())|| (passwordLog.isEmpty())){
             Toast.makeText(getApplicationContext(),"You cannot leave empty fields",Toast.LENGTH_LONG).show();
 
         }else{
@@ -72,7 +72,7 @@ public class LoginActivity extends AppCompatActivity {
                         Toast.makeText(getApplicationContext(),message,Toast.LENGTH_LONG).show();
                     }else{
                         //StateResponse stateResponse = gson.fromJson(response.body(),StateResponse.class);
-                        String message = "server rejected this action ";
+                        String message = "invalid info provided";
                         Toast.makeText(getApplicationContext(),message,Toast.LENGTH_LONG).show();
                     }
 

@@ -75,12 +75,42 @@ public class RegisterActivity extends AppCompatActivity {
     }
 
     public void validateFields(String userName, String firstName, String lastName, String email, String password){
-        if((userName.isEmpty())|| (firstName.isEmpty()) || (lastName.isEmpty()) || (email.isEmpty()) || (password.isEmpty())){
+        if((userName.trim().isEmpty())|| (firstName.trim().isEmpty()) || (lastName.trim().isEmpty()) || (email.trim().isEmpty()) || (password.isEmpty())){
             Toast.makeText(getApplicationContext(),"Incomplete form",Toast.LENGTH_LONG).show();
 
         }else{
-            Intent intent = new Intent(RegisterActivity.this, ToDoListActivity.class);
-            startActivity(intent);
+            Call<JsonObject> call = userService.register(userName,password,firstName,
+                    lastName,email);
+            System.out.println("calling api from testRegister");
+            call.enqueue(new Callback<JsonObject>() {
+                Gson gson = new Gson();
+                @Override
+                public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
+                    System.out.println("finished calling API from testRegister");
+                    if (response.body().has("id")){
+                        UserResponse userResponse = gson.fromJson(response.body(),UserResponse.class);
+                        System.out.println("the user has name: " + userResponse.getFirstname() + " " + userResponse.getLastname() + " was registered and logged in");
+                        Intent intent = new Intent(RegisterActivity.this, ToDoListActivity.class);
+                        startActivity(intent);
+                        finish();
+                    } else if (response.body().has("message")){
+                        MessageResponse messageResponse = gson.fromJson(response.body(),MessageResponse.class);
+                        String message = "You were not registered since: " + messageResponse.getMessage();
+                        Toast.makeText(getApplicationContext(),message,Toast.LENGTH_LONG).show();
+                    }else{
+                        //StateResponse stateResponse = gson.fromJson(response.body(),StateResponse.class);
+                        String message = "invalid info provided";
+                        Toast.makeText(getApplicationContext(),message,Toast.LENGTH_LONG).show();
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<JsonObject> call, Throwable t) {
+                    System.out.println(t);
+                    System.out.println("Something went wrong when trying to connect to the server");
+                }
+            });
+
         }
     }
 
