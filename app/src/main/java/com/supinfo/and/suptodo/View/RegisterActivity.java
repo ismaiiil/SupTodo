@@ -1,18 +1,17 @@
-package com.supinfo.and.suptodo;
+package com.supinfo.and.suptodo.View;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParseException;
-import com.google.gson.JsonSyntaxException;
+import com.supinfo.and.suptodo.R;
 import com.supinfo.and.suptodo.model.MessageResponse;
 import com.supinfo.and.suptodo.model.StateResponse;
 import com.supinfo.and.suptodo.model.TodoResponse;
 import com.supinfo.and.suptodo.model.UserResponse;
-import com.supinfo.and.suptodo.remote.ApiUtil;
-import com.supinfo.and.suptodo.remote.UserService;
+import com.supinfo.and.suptodo.API.ApiUtil;
+import com.supinfo.and.suptodo.API.UserService;
 
 import java.util.List;
 

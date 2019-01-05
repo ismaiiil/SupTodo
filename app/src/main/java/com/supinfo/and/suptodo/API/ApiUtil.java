@@ -1,4 +1,4 @@
-package com.supinfo.and.suptodo.remote;
+package com.supinfo.and.suptodo.API;
 
 public class ApiUtil {
 

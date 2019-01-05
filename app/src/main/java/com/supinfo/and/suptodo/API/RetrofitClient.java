@@ -1,4 +1,4 @@
-package com.supinfo.and.suptodo.remote;
+package com.supinfo.and.suptodo.API;
 
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
