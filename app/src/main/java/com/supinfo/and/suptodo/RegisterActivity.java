@@ -61,6 +61,7 @@ public class RegisterActivity extends AppCompatActivity {
     public void openLoginActivity(){
         Intent intent = new Intent(this, LoginActivity.class);
         startActivity(intent);
+        finish();
     }
 
 
