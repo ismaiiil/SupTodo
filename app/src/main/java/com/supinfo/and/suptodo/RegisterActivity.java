@@ -16,8 +16,6 @@ public class RegisterActivity extends AppCompatActivity {
     private EditText editEmail;
     private EditText editPassword;
     private Button btnRegister;
-    String toastWhenInvalid = "Incomplete form";
-   // private int counter = 3;
     private Button btnLoginInstead;
 
 
@@ -27,6 +25,20 @@ public class RegisterActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
 
+        getUIElements();
+
+        btnRegister.setOnClickListener((v) ->
+                validateFields(editUserName.getText().toString(), editFirstName.getText().toString(), editLastName.getText().toString(), editEmail.getText().toString(), editPassword.getText().toString())
+        );
+
+        btnLoginInstead.setOnClickListener(v ->
+                openLoginActivity()
+        );
+
+
+    }
+
+    private void getUIElements() {
         editUserName = (EditText)findViewById(R.id.UserName);
         editFirstName = (EditText)findViewById(R.id.FirstName);
         editLastName = (EditText)findViewById(R.id.LastName);
@@ -34,29 +46,11 @@ public class RegisterActivity extends AppCompatActivity {
         editPassword = (EditText)findViewById(R.id.Password);
         btnRegister = (Button) findViewById(R.id.registerBtn);
         btnLoginInstead = (Button)findViewById(R.id.loginInsBtn);
-
-        btnRegister.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                validateIfEmpty(editUserName.getText().toString(), editFirstName.getText().toString(), editLastName.getText().toString(), editEmail.getText().toString(), editPassword.getText().toString());
-            }
-        });
-
-        btnLoginInstead.setOnClickListener(new View.OnClickListener(){
-
-            @Override
-            public void onClick(View v){
-                openLoginActivity();
-            }
-
-        });
-
-
     }
 
-    public void validateIfEmpty(String userName, String firstName, String lastName, String email, String password){
+    public void validateFields(String userName, String firstName, String lastName, String email, String password){
         if((userName.isEmpty())|| (firstName.isEmpty()) || (lastName.isEmpty()) || (email.isEmpty()) || (password.isEmpty())){
-            Toast.makeText(getApplicationContext(),toastWhenInvalid,Toast.LENGTH_LONG).show();
+            Toast.makeText(getApplicationContext(),"Incomplete form",Toast.LENGTH_LONG).show();
 
         }else{
             Intent intent = new Intent(RegisterActivity.this, ToDoListActivity.class);

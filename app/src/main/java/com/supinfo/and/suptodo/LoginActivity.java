@@ -14,7 +14,6 @@ public class LoginActivity extends AppCompatActivity {
     private EditText editUserNameLog;
     private EditText editPasswordLog;
     private Button btnLogin;
-    String toastWhenIncomplete = "Try Again";
     private Button btnRegisterIns;
 
     @Override
@@ -22,31 +21,25 @@ public class LoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        editUserNameLog = (EditText)findViewById(R.id.userNameLog);
-        editPasswordLog = (EditText)findViewById(R.id.passwordLog);
-        btnLogin = (Button)findViewById(R.id.loginBtn);
-        btnRegisterIns = (Button)findViewById(R.id.registerInsBtn);
+        getUIElements();
 
-        btnLogin.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                validateIfEmpty(editUserNameLog.getText().toString(), editPasswordLog.getText().toString());
-            }
-        });
+        btnLogin.setOnClickListener(v -> validateFields(editUserNameLog.getText().toString(), editPasswordLog.getText().toString()));
 
-        btnRegisterIns.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                returnToPreviousActivity();
-            }
-        });
+        btnRegisterIns.setOnClickListener(v -> returnToPreviousActivity());
 
 
     }
 
-    public void validateIfEmpty(String userNameLog, String passwordLog){
+    private void getUIElements() {
+        editUserNameLog = (EditText)findViewById(R.id.userNameLog);
+        editPasswordLog = (EditText)findViewById(R.id.passwordLog);
+        btnLogin = (Button)findViewById(R.id.loginBtn);
+        btnRegisterIns = (Button)findViewById(R.id.registerInsBtn);
+    }
+
+    public void validateFields(String userNameLog, String passwordLog){
         if((userNameLog.isEmpty())|| (passwordLog.isEmpty())){
-            Toast.makeText(getApplicationContext(),toastWhenIncomplete,Toast.LENGTH_LONG).show();
+            Toast.makeText(getApplicationContext(),"You cannot leave empty fields",Toast.LENGTH_LONG).show();
 
         }else{
             Intent intent = new Intent(LoginActivity.this, ToDoListActivity.class);
