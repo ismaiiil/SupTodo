@@ -26,7 +26,7 @@ import retrofit2.Response;
 
 public class RegisterActivity extends AppCompatActivity {
 
-    UserService userService;
+    UserService userService = ApiUtil.getUserService();
 
     private EditText editUserName;
     private EditText editFirstName;
@@ -42,9 +42,7 @@ public class RegisterActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
-        userService = ApiUtil.getUserService();
         testRegister();
-        testLogin();
         testList();
         testRead();
         testUpdate();
@@ -180,36 +178,6 @@ public class RegisterActivity extends AppCompatActivity {
 
     }
 
-    private void testLogin(){
-        Call<JsonObject> call = userService.login("userone","test");
-        System.out.println("calling api from testLogin");
-        call.enqueue(new Callback<JsonObject>() {
-            Gson gson = new Gson();
-            @Override
-            public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
-                System.out.println("finished calling API from testLogin");
-                if (response.body().has("id")){
-                    UserResponse userResponse = gson.fromJson(response.body(),UserResponse.class);
-                    System.out.println("the user has name: " + userResponse.getFirstname() + " " + userResponse.getLastname());
-                } else if (response.body().has("message")){
-                    MessageResponse messageResponse = gson.fromJson(response.body(),MessageResponse.class);
-                    System.out.println("login failed: " + messageResponse.getMessage());
-                }else{
-                    StateResponse stateResponse = gson.fromJson(response.body(),StateResponse.class);
-                    System.out.println("server rejected this action " + stateResponse.isSuccess());
-                }
-
-            }
-
-            @Override
-            public void onFailure(Call<JsonObject> call, Throwable t) {
-                System.out.println(t);
-                System.out.println("Something went wrong when trying to connect to the server");
-            }
-
-        });
-
-    }
 
     private void testLogout(){
         Call<StateResponse> call = userService.logout();
