@@ -3,6 +3,12 @@ package com.supinfo.and.suptodo;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
+import com.google.gson.JsonSyntaxException;
+import com.supinfo.and.suptodo.model.MessageResponse;
+import com.supinfo.and.suptodo.model.StateResponse;
 import com.supinfo.and.suptodo.model.TodoResponse;
 import com.supinfo.and.suptodo.model.UserResponse;
 import com.supinfo.and.suptodo.remote.ApiUtil;
@@ -28,19 +34,29 @@ public class RegisterActivity extends AppCompatActivity {
     }
 
     private void testLogin(){
-        Call<UserResponse> call = userService.login("userone","test");
+        Call<JsonObject> call = userService.login("","");
         System.out.println("calling api");
-        call.enqueue(new Callback<UserResponse>() {
+        call.enqueue(new Callback<JsonObject>() {
+            Gson gson = new Gson();
             @Override
-            public void onResponse(Call<UserResponse> call, Response<UserResponse> response) {
-                System.out.println(response.body().getFirstname());
-                System.out.println("finised calling api");
+            public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
+                if (response.body().has("id")){
+                    UserResponse userResponse = gson.fromJson(response.body(),UserResponse.class);
+                    System.out.println(userResponse.getFirstname());
+                } else if (response.body().has("message")){
+                    MessageResponse messageResponse = gson.fromJson(response.body(),MessageResponse.class);
+                    System.out.println(messageResponse.getMessage());
+                }else{
+                    StateResponse stateResponse = gson.fromJson(response.body(),StateResponse.class);
+                    System.out.println(stateResponse.isSuccess());
+                }
+
             }
 
             @Override
-            public void onFailure(Call<UserResponse> call, Throwable t) {
+            public void onFailure(Call<JsonObject> call, Throwable t) {
                 System.out.println(t);
-                System.out.println("finised calling api");
+                System.out.println("Something went wrong when trying to connect to the server");
             }
 
         });
