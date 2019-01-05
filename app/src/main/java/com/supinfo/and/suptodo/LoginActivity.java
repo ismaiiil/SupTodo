@@ -21,7 +21,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 
-public class LoginActivity extends AppCompatActivity {
+public class LoginActivity extends BaseActivity {
 
     private EditText editUserNameLog;
     private EditText editPasswordLog;
@@ -52,11 +52,12 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     public void validateFields(String userNameLog, String passwordLog){
-        if((userNameLog.trim().isEmpty())|| (passwordLog.isEmpty())){
+        if((userNameLog.trim().isEmpty())|| (passwordLog.trim().isEmpty())){
             Toast.makeText(getApplicationContext(),"You cannot leave empty fields",Toast.LENGTH_LONG).show();
 
         }else{
             Call<JsonObject> call = userService.login(userNameLog,passwordLog);
+            showProgressDialog();
             call.enqueue(new Callback<JsonObject>() {
                 Gson gson = new Gson();
                 @Override
@@ -65,14 +66,17 @@ public class LoginActivity extends AppCompatActivity {
                         UserResponse userResponse = gson.fromJson(response.body(),UserResponse.class);
                         Intent intent = new Intent(LoginActivity.this, ToDoListActivity.class);
                         startActivity(intent);
-                        finish();
+                        hideProgressDialog();
+                        //finish();
                     } else if (response.body().has("message")){
                         MessageResponse messageResponse = gson.fromJson(response.body(),MessageResponse.class);
                         String message = "login failed: " + messageResponse.getMessage();
+                        hideProgressDialog();
                         Toast.makeText(getApplicationContext(),message,Toast.LENGTH_LONG).show();
                     }else{
                         //StateResponse stateResponse = gson.fromJson(response.body(),StateResponse.class);
                         String message = "invalid info provided";
+                        hideProgressDialog();
                         Toast.makeText(getApplicationContext(),message,Toast.LENGTH_LONG).show();
                     }
 
@@ -82,6 +86,7 @@ public class LoginActivity extends AppCompatActivity {
                 public void onFailure(Call<JsonObject> call, Throwable t) {
                     System.out.println(t);
                     System.out.println("Something went wrong when trying to connect to the server");
+                    hideProgressDialog();
                 }
 
             });
