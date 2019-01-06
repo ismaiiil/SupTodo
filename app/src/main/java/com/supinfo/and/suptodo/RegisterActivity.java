@@ -11,6 +11,7 @@ import android.widget.Toast;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.supinfo.and.suptodo.R;
+import com.supinfo.and.suptodo.SQLITE.User;
 import com.supinfo.and.suptodo.model.MessageResponse;
 import com.supinfo.and.suptodo.model.StateResponse;
 import com.supinfo.and.suptodo.model.TodoResponse;
@@ -42,13 +43,9 @@ public class RegisterActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
-        testRegister();
+        setTitle(R.string.title_activity_register);
+
         testList();
-        testRead();
-        testUpdate();
-        testRead();
-        testShare();
-        testLogout();
 
 
         getUIElements();
@@ -63,6 +60,7 @@ public class RegisterActivity extends BaseActivity {
 
 
     }
+
 
     private void getUIElements() {
         editUserName = (EditText)findViewById(R.id.UserName);
@@ -79,43 +77,7 @@ public class RegisterActivity extends BaseActivity {
             Toast.makeText(getApplicationContext(),"Incomplete form",Toast.LENGTH_LONG).show();
 
         }else{
-            Call<JsonObject> call = userService.register(userName,password,firstName,
-                    lastName,email);
-            System.out.println("calling api from testRegister");
-            showProgressDialog();
-            call.enqueue(new Callback<JsonObject>() {
-                Gson gson = new Gson();
-                @Override
-                public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
-                    System.out.println("finished calling API from testRegister");
-                    if (response.body().has("id")){
-                        UserResponse userResponse = gson.fromJson(response.body(),UserResponse.class);
-                        System.out.println("the user has name: " + userResponse.getFirstname() + " " + userResponse.getLastname() + " was registered and logged in");
-                        Intent intent = new Intent(RegisterActivity.this, ToDoListActivity.class);
-                        startActivity(intent);
-                        hideProgressDialog();
-                        //finish();
-                    } else if (response.body().has("message")){
-                        MessageResponse messageResponse = gson.fromJson(response.body(),MessageResponse.class);
-                        String message = "You were not registered since: " + messageResponse.getMessage();
-                        hideProgressDialog();
-                        Toast.makeText(getApplicationContext(),message,Toast.LENGTH_LONG).show();
-                    }else{
-                        //StateResponse stateResponse = gson.fromJson(response.body(),StateResponse.class);
-                        String message = "invalid info provided";
-                        hideProgressDialog();
-                        Toast.makeText(getApplicationContext(),message,Toast.LENGTH_LONG).show();
-                    }
-                }
-
-                @Override
-                public void onFailure(Call<JsonObject> call, Throwable t) {
-                    System.out.println(t);
-                    System.out.println("Something went wrong when trying to connect to the server");
-                    hideProgressDialog();
-                }
-            });
-
+            registerUser(userName,password,firstName,lastName,email);
         }
     }
 
@@ -232,34 +194,6 @@ public class RegisterActivity extends BaseActivity {
         });
     }
 
-    private void testRegister(){
-        Call<JsonObject> call = userService.register("userten","test","jeff",
-                "maname","test@mail.com");
-        System.out.println("calling api from testRegister");
-        call.enqueue(new Callback<JsonObject>() {
-            Gson gson = new Gson();
-            @Override
-            public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
-                System.out.println("finished calling API from testRegister");
-                if (response.body().has("id")){
-                    UserResponse userResponse = gson.fromJson(response.body(),UserResponse.class);
-                    System.out.println("the user has name: " + userResponse.getFirstname() + " " + userResponse.getLastname() + " was registered and logged in");
-                } else if (response.body().has("message")){
-                    MessageResponse messageResponse = gson.fromJson(response.body(),MessageResponse.class);
-                    System.out.println("You were not registered since: " + messageResponse.getMessage());
-                }else{
-                    StateResponse stateResponse = gson.fromJson(response.body(),StateResponse.class);
-                    System.out.println("You were not registered: "+stateResponse.isSuccess());
-                }
-            }
-
-            @Override
-            public void onFailure(Call<JsonObject> call, Throwable t) {
-                System.out.println(t);
-                System.out.println("Something went wrong when trying to connect to the server");
-            }
-        });
-    }
 
     private void testList(){
         Call<List<TodoResponse>> call = userService.list("userone","test");
@@ -284,8 +218,6 @@ public class RegisterActivity extends BaseActivity {
         });
 
     }
-
-
 
     public void openLoginActivity(){
         Intent intent = new Intent(this, LoginActivity.class);

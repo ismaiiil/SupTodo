@@ -9,5 +9,11 @@ public class ToDoListActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_to_do_list);
+        setTitle(R.string.title_activity_todolist);
     }
+
+
+// do this to windows you want back button to behave normally
+//    @Override
+//    public void onBackPressed() {finish();}
 }

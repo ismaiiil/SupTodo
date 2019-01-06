@@ -12,6 +12,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.supinfo.and.suptodo.API.ApiUtil;
 import com.supinfo.and.suptodo.API.UserService;
+import com.supinfo.and.suptodo.SQLITE.User;
 import com.supinfo.and.suptodo.model.MessageResponse;
 import com.supinfo.and.suptodo.model.StateResponse;
 import com.supinfo.and.suptodo.model.UserResponse;
@@ -34,6 +35,7 @@ public class LoginActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+        setTitle(R.string.title_activity_login);
 
         getUIElements();
 
@@ -56,41 +58,7 @@ public class LoginActivity extends BaseActivity {
             Toast.makeText(getApplicationContext(),"You cannot leave empty fields",Toast.LENGTH_LONG).show();
 
         }else{
-            Call<JsonObject> call = userService.login(userNameLog,passwordLog);
-            showProgressDialog();
-            call.enqueue(new Callback<JsonObject>() {
-                Gson gson = new Gson();
-                @Override
-                public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
-                    if (response.body().has("id")){
-                        UserResponse userResponse = gson.fromJson(response.body(),UserResponse.class);
-                        Intent intent = new Intent(LoginActivity.this, ToDoListActivity.class);
-                        startActivity(intent);
-                        hideProgressDialog();
-                        //finish();
-                    } else if (response.body().has("message")){
-                        MessageResponse messageResponse = gson.fromJson(response.body(),MessageResponse.class);
-                        String message = "login failed: " + messageResponse.getMessage();
-                        hideProgressDialog();
-                        Toast.makeText(getApplicationContext(),message,Toast.LENGTH_LONG).show();
-                    }else{
-                        //StateResponse stateResponse = gson.fromJson(response.body(),StateResponse.class);
-                        String message = "invalid info provided";
-                        hideProgressDialog();
-                        Toast.makeText(getApplicationContext(),message,Toast.LENGTH_LONG).show();
-                    }
-
-                }
-
-                @Override
-                public void onFailure(Call<JsonObject> call, Throwable t) {
-                    System.out.println(t);
-                    System.out.println("Something went wrong when trying to connect to the server");
-                    hideProgressDialog();
-                }
-
-            });
-
+            loginUser(new User(userNameLog,passwordLog));
         }
     }
 
