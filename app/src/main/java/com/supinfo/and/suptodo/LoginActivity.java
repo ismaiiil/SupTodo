@@ -41,7 +41,7 @@ public class LoginActivity extends AppCompatActivity {
             Toast.makeText(getApplicationContext(),"You cannot leave empty fields",Toast.LENGTH_LONG).show();
 
         }else{
-            Intent intent = new Intent(LoginActivity.this, ChooseActivity.class);
+            Intent intent = new Intent(LoginActivity.this, ToDoListActivity.class);
             startActivity(intent);
         }
     }

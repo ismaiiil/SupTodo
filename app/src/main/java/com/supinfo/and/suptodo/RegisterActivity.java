@@ -52,7 +52,7 @@ public class RegisterActivity extends AppCompatActivity {
             Toast.makeText(getApplicationContext(),"Incomplete form",Toast.LENGTH_LONG).show();
 
         }else{
-            Intent intent = new Intent(RegisterActivity.this, ChooseActivity.class);
+            Intent intent = new Intent(RegisterActivity.this, ToDoListActivity.class);
             startActivity(intent);
         }
     }

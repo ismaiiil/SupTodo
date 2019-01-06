@@ -8,7 +8,7 @@ import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.Button;
 
-public class ChooseActivity extends AppCompatActivity {
+public class ToDoListActivity extends AppCompatActivity {
 
     private Button btnLogout;
     private Button btnAddToDoList;
@@ -17,7 +17,7 @@ public class ChooseActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.choose_activity);
+        setContentView(R.layout.activity_to_do_list);
 
         getUIElements();
 
