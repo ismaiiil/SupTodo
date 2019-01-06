@@ -3,7 +3,6 @@ package com.supinfo.and.suptodo;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -53,7 +52,7 @@ public class RegisterActivity extends AppCompatActivity {
             Toast.makeText(getApplicationContext(),"Incomplete form",Toast.LENGTH_LONG).show();
 
         }else{
-            Intent intent = new Intent(RegisterActivity.this, ToDoListActivity.class);
+            Intent intent = new Intent(RegisterActivity.this, ChooseActivity.class);
             startActivity(intent);
         }
     }

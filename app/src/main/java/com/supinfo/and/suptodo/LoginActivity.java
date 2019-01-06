@@ -3,7 +3,6 @@ package com.supinfo.and.suptodo;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -42,7 +41,7 @@ public class LoginActivity extends AppCompatActivity {
             Toast.makeText(getApplicationContext(),"You cannot leave empty fields",Toast.LENGTH_LONG).show();
 
         }else{
-            Intent intent = new Intent(LoginActivity.this, ToDoListActivity.class);
+            Intent intent = new Intent(LoginActivity.this, ChooseActivity.class);
             startActivity(intent);
         }
     }
