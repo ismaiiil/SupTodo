@@ -1,6 +1,9 @@
 <resources>
     <string name="app_name">SupTodo</string>
     <string name="title_activity_login">Sign in</string>
+    <string name="btn_Add">Add</string>
+    <string name="btn_Logout">Logout</string>
+    <string name="btn_Edit">Edit</string>
     <string name="title_activity_register">Register</string>
     <string name="title_activity_launch">SUPTodo</string>
     <string name="title_activity_todolist">Your Todo Lists</string>
