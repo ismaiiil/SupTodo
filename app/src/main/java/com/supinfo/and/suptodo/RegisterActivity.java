@@ -79,38 +79,6 @@ public class RegisterActivity extends BaseActivity {
 
 
 
-    private void testRead() {
-        Call<JsonObject> call = userService.read("userone","test",572);
-        System.out.println("calling api from testRead");
-        call.enqueue(new Callback<JsonObject>() {
-            Gson gson = new Gson();
-            @Override
-            public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
-                System.out.println("finished calling API from testRead");
-                if (response.body().has("id")){
-                    TodoResponse todoResponse = gson.fromJson(response.body(),TodoResponse.class);
-                    System.out.println("the todo is with id " + todoResponse.getId() + " and text " + todoResponse.getTodo());
-                } else if (response.body().has("message")){
-                    MessageResponse messageResponse = gson.fromJson(response.body(),MessageResponse.class);
-                    System.out.println("the todo was not read: " + messageResponse.getMessage());
-                }else{
-                    StateResponse stateResponse = gson.fromJson(response.body(),StateResponse.class);
-                    System.out.println("server rejected this action " +stateResponse.isSuccess());
-                }
-
-            }
-
-            @Override
-            public void onFailure(Call<JsonObject> call, Throwable t) {
-                System.out.println(t);
-                System.out.println("Something went wrong when trying to connect to the server");
-            }
-
-        });
-
-
-    }
-
     public void openLoginActivity(){
         Intent intent = new Intent(this, LoginActivity.class);
         startActivity(intent);

@@ -14,6 +14,9 @@ import com.google.gson.JsonObject;
 import com.supinfo.and.suptodo.API.APICallHandler;
 import com.supinfo.and.suptodo.API.ApiUtil;
 import com.supinfo.and.suptodo.API.UserService;
+import com.supinfo.and.suptodo.SQLITE.DeleteAllCompletionHandler;
+import com.supinfo.and.suptodo.SQLITE.GetUserCompletionHandler;
+import com.supinfo.and.suptodo.SQLITE.SQLITEAsyncTasks;
 import com.supinfo.and.suptodo.SQLITE.User;
 import com.supinfo.and.suptodo.SQLITE.UserDao;
 import com.supinfo.and.suptodo.SQLITE.UserRoomDatabase;
@@ -32,10 +35,8 @@ import retrofit2.Response;
 
 public class BaseActivity extends AppCompatActivity {
     ProgressDialog progressDialog;
-    UserService userService = ApiUtil.getUserService();
     APICallHandler APIInstance = APICallHandler.getINSTANCE();
     UserDao userDao;
-    User cachedUser;
 
     public String LOGGED_USER_KEY = "LOGGED_USER_KEY";
 
@@ -87,102 +88,19 @@ public class BaseActivity extends AppCompatActivity {
         startActivity(new Intent(this, RegisterActivity.class));
     }
 
-    User getCachedUser() throws ExecutionException, InterruptedException{
-        return new GetCachedUserAsyncTask(userDao,this).execute().get();
+    User getCachedUser(GetUserCompletionHandler getUserCompletionHandler) throws ExecutionException, InterruptedException{
+        return new SQLITEAsyncTasks.GetCachedUserAsyncTask(userDao,getUserCompletionHandler).execute().get();
     }
 
-    private void insert (User user) {
-        new InsertAsyncTask(userDao).execute(user);
+    public void insert (User user) {
+        new SQLITEAsyncTasks.InsertAsyncTask(userDao).execute(user);
     }
 
-    public void deleteAllAndInsert(User user){ new DeleteAndInsertAsyncTask(userDao,this,user).execute(); }
-
-    public void deleteAll(){ new DeleteAllAsyncTask(userDao).execute(); }
-
-    private static class DeleteAndInsertAsyncTask extends AsyncTask<User, Void, Void> {
-
-        private UserDao mAsyncTaskDao;
-        private User user;
-        WeakReference<BaseActivity> baseActivity;
-
-        DeleteAndInsertAsyncTask(UserDao dao, BaseActivity baseActivity , User user) {
-            mAsyncTaskDao = dao;
-            this.baseActivity = new WeakReference<BaseActivity>(baseActivity);
-            this.user = user;
-        }
-
-        @Override
-        protected Void doInBackground(final User... params) {
-            mAsyncTaskDao.deleteAll();
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(Void aVoid) {
-            super.onPostExecute(aVoid);
-            baseActivity.get().insert(user);
-        }
-    }
-
-    private static class InsertAsyncTask extends AsyncTask<User, Void, Void> {
-
-        private UserDao mAsyncTaskDao;
-
-        InsertAsyncTask(UserDao dao) {
-            mAsyncTaskDao = dao;
-        }
-
-        @Override
-        protected Void doInBackground(final User... params) {
-            mAsyncTaskDao.insert(params[0]);
-            return null;
-        }
-
-    }
-
-    private static class DeleteAllAsyncTask extends AsyncTask<Void, Void, Void> {
-
-        private UserDao mAsyncTaskDao;
-
-        DeleteAllAsyncTask(UserDao dao) {
-            mAsyncTaskDao = dao;
-        }
-
-        @Override
-        protected Void doInBackground(Void... voids) {
-            mAsyncTaskDao.deleteAll();
-            return null;
-        }
+    public void deleteAll(DeleteAllCompletionHandler deleteAllCompletionHandler){ new SQLITEAsyncTasks.DeleteAllAsyncTask(userDao,deleteAllCompletionHandler).execute(); }
 
 
-    }
 
-    private static class GetCachedUserAsyncTask extends android.os.AsyncTask<Void, Void, User> {
 
-        private UserDao mAsyncTaskDao;
-        WeakReference<BaseActivity> baseActivity;
-
-        GetCachedUserAsyncTask(UserDao dao, BaseActivity baseActivity) {
-            mAsyncTaskDao = dao;
-            this.baseActivity = new WeakReference<BaseActivity>(baseActivity);
-        }
-
-        @Override
-        protected User doInBackground(Void... voids) {
-            return mAsyncTaskDao.getCachedUser();
-        }
-
-        @Override
-        protected void onPostExecute(User user) {
-            super.onPostExecute(user);
-            if(user != null){
-                baseActivity.get().APIInstance.loginUser(baseActivity.get(),user,null);
-            }else{
-                baseActivity.get().startRegisterActivity();
-            }
-
-        }
-    }
 
 
 

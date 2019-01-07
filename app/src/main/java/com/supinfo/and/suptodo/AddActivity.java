@@ -54,5 +54,8 @@ public class AddActivity extends BaseActivity {
 
     }
 
+    //do this to windows you want back button to behave normally
+    @Override
+    public void onBackPressed() {finish();}
 
 }

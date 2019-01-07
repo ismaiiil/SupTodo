@@ -22,7 +22,13 @@ public class LaunchActivity extends BaseActivity {
         setContentView(R.layout.activity_launch);
         setTitle(R.string.title_activity_launch);
         try {
-            getCachedUser();
+            getCachedUser(user -> {
+                if(user != null){
+                    APIInstance.loginUser(this,user,null);
+                }else{
+                    startRegisterActivity();
+                }
+            });
 
         } catch (ExecutionException e) {
             e.printStackTrace();
