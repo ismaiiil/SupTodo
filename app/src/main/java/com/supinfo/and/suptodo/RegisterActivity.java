@@ -77,67 +77,7 @@ public class RegisterActivity extends BaseActivity {
         }
     }
 
-    private void testShare() {
-        Call<JsonObject> call = userService.share("userone","test","usertwo");
-        System.out.println("calling api from testShare");
-        call.enqueue(new Callback<JsonObject>() {
-            Gson gson = new Gson();
-            @Override
-            public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
-                System.out.println("finished calling API from testShare");
-                if (response.body().has("message")){
-                    MessageResponse messageResponse = gson.fromJson(response.body(),MessageResponse.class);
-                    System.out.println("the todo was not shared: " + messageResponse.getMessage());
-                }else{
-                    StateResponse stateResponse = gson.fromJson(response.body(),StateResponse.class);
-                    if (stateResponse.isSuccess()) {
-                        System.out.println("the todo was shared: " +stateResponse.isSuccess());
-                    }else{
-                        System.out.println("server rejected this action " +stateResponse.isSuccess());
-                    }
-                }
 
-            }
-
-            @Override
-            public void onFailure(Call<JsonObject> call, Throwable t) {
-                System.out.println(t);
-                System.out.println("Something went wrong when trying to connect to the server");
-            }
-
-        });
-    }
-
-    private void testUpdate() {
-        Call<JsonObject> call = userService.update("userone","test",572,"the first todo \n the 2nd todo");
-        System.out.println("calling api from testUpdate");
-        call.enqueue(new Callback<JsonObject>() {
-            Gson gson = new Gson();
-            @Override
-            public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
-                System.out.println("finished calling API from testUpdate");
-                if (response.body().has("message")){
-                    MessageResponse messageResponse = gson.fromJson(response.body(),MessageResponse.class);
-                    System.out.println("the todo was not updated: " + messageResponse.getMessage());
-                }else{
-                    StateResponse stateResponse = gson.fromJson(response.body(),StateResponse.class);
-                    if (stateResponse.isSuccess()) {
-                        System.out.println("the todo was updated: " +stateResponse.isSuccess());
-                    }else{
-                        System.out.println("server rejected this action " +stateResponse.isSuccess());
-                    }
-                }
-
-            }
-
-            @Override
-            public void onFailure(Call<JsonObject> call, Throwable t) {
-                System.out.println(t);
-                System.out.println("Something went wrong when trying to connect to the server");
-            }
-
-        });
-    }
 
     private void testRead() {
         Call<JsonObject> call = userService.read("userone","test",572);
@@ -170,11 +110,6 @@ public class RegisterActivity extends BaseActivity {
 
 
     }
-
-
-
-
-
 
     public void openLoginActivity(){
         Intent intent = new Intent(this, LoginActivity.class);

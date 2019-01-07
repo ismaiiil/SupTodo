@@ -8,6 +8,7 @@ import android.widget.ListView;
 import android.widget.Button;
 import android.widget.Toast;
 
+import com.supinfo.and.suptodo.SQLITE.User;
 import com.supinfo.and.suptodo.model.TodoResponse;
 import com.supinfo.and.suptodo.model.UserResponse;
 
@@ -33,7 +34,8 @@ public class ToDoListActivity extends BaseActivity {
 
         getUIElements();
 
-        listFromAPIAndUpdateListView(loggedUser.getUsername(),loggedUser.getPassword(),this);
+        refreshListViewFromAPI();
+
         btnLogout.setOnClickListener(v ->
                 logoutAndCloseActivity()
 
@@ -57,6 +59,20 @@ public class ToDoListActivity extends BaseActivity {
 
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        refreshListViewFromAPI();
+    }
+
+    private void refreshListViewFromAPI() {
+        listFromAPI(loggedUser.getUsername(), loggedUser.getPassword(), todoResponses -> {
+            ListView multiListView = (ListView) findViewById(R.id.multiListView);
+            ToDoItemAdapter multiListViewAdapter = new ToDoItemAdapter(this,todoResponses);
+            multiListView.setAdapter(multiListViewAdapter);
+        });
+    }
+
     private void getUIElements(){
 
         btnLogout = (Button)findViewById(R.id.logoutBtn);
@@ -70,6 +86,7 @@ public class ToDoListActivity extends BaseActivity {
 
     public void openAddActivity(){
         Intent intent = new Intent(this, AddActivity.class);
+        intent.putExtra(LOGGED_USER_KEY,new User(loggedUser.getUsername(),loggedUser.getPassword()));
         startActivity(intent);
     }
 

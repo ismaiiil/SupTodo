@@ -37,7 +37,6 @@ public class LoginActivity extends BaseActivity {
         setTitle(R.string.title_activity_login);
 
         getUIElements();
-
         btnLogin.setOnClickListener(v -> validateFields(editUserNameLog.getText().toString(), editPasswordLog.getText().toString()));
 
         btnRegisterIns.setOnClickListener(v -> returnToPreviousActivity());
