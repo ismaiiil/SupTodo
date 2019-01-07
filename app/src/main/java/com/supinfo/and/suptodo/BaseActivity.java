@@ -2,14 +2,11 @@ package com.supinfo.and.suptodo;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
-import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.widget.ListView;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
@@ -301,28 +298,111 @@ public class BaseActivity extends AppCompatActivity {
         });
     }
 
-    protected void listFromAPIAndUpdateListView(String username,String password, ToDoListActivity toDoListActivity){
+    protected void listFromAPI(String username,String password, MyTodoListCompletionHandler myListener){
         showProgressDialog("Refreshing");
         Call<List<TodoResponse>> call = userService.list(username,password);
         System.out.println("calling api from testList");
         call.enqueue(new Callback<List<TodoResponse>>() {
             @Override
             public void onResponse(Call<List<TodoResponse>> call, Response<List<TodoResponse>> response) {
-                ListView multiListView = (ListView)findViewById(R.id.multiListView);
-                ToDoItemAdapter multiListViewAdapter = new ToDoItemAdapter(toDoListActivity,response.body());
-                multiListView.setAdapter(multiListViewAdapter);
-                System.out.println("finished calling API from testList");
-                System.out.println();
+                myListener.onFinished(response.body());
                 hideProgressDialog();
+
             }
             @Override
             public void onFailure(Call<List<TodoResponse>> call, Throwable t) {
                 System.out.println(t);
-                System.out.println("Something went wrong when trying to connect to the server");
+                String message = "Something went wrong when trying to connect to the server";
+                Toast.makeText(getApplicationContext(),message,Toast.LENGTH_LONG).show();
                 hideProgressDialog();
             }
         });
 
+    }
+
+    public interface MyTodoListCompletionHandler {
+        void onFinished(List<TodoResponse> todoResponses);
+    }
+
+
+    protected void shareWithFriend(String username,String password,String userFriend, ShareCompletionHandler shareCH) {
+        showProgressDialog("Adding your friend");
+        Call<JsonObject> call = userService.share(username,password,userFriend);
+        System.out.println("calling api from testShare");
+        call.enqueue(new Callback<JsonObject>() {
+            Gson gson = new Gson();
+            @Override
+            public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
+                System.out.println("finished calling API from testShare");
+                if (response.body().has("message")){
+                    MessageResponse messageResponse = gson.fromJson(response.body(),MessageResponse.class);
+                    System.out.println("the todo was not shared: " + messageResponse.getMessage());
+                    shareCH.onFinished(false);
+                    hideProgressDialog();
+                }else{
+                    StateResponse stateResponse = gson.fromJson(response.body(),StateResponse.class);
+                    if (stateResponse.isSuccess()) {
+                        System.out.println("the todo was shared: " +stateResponse.isSuccess());
+                        shareCH.onFinished(true);
+                        hideProgressDialog();
+                    }else{
+                        System.out.println("server rejected this action " +stateResponse.isSuccess());
+                        shareCH.onFinished(false);
+                        hideProgressDialog();
+                    }
+                }
+
+            }
+
+            @Override
+            public void onFailure(Call<JsonObject> call, Throwable t) {
+                System.out.println(t);
+                System.out.println("Something went wrong when trying to connect to the server");
+                hideProgressDialog();
+            }
+
+        });
+    }
+
+    public interface ShareCompletionHandler{
+        void onFinished(Boolean wasShared);
+    }
+
+
+    protected void updateTodoByID(String username,String password, int id, String todo) {
+        showProgressDialog("Updating your todo!");
+        Call<JsonObject> call = userService.update(username,password,id,todo);
+        System.out.println("calling api from testUpdate");
+        call.enqueue(new Callback<JsonObject>() {
+            Gson gson = new Gson();
+            @Override
+            public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
+                System.out.println("finished calling API from testUpdate");
+                if (response.body().has("message")){
+                    MessageResponse messageResponse = gson.fromJson(response.body(),MessageResponse.class);
+                    System.out.println("the todo was not updated: " + messageResponse.getMessage());
+                    hideProgressDialog();
+                }else{
+                    StateResponse stateResponse = gson.fromJson(response.body(),StateResponse.class);
+                    if (stateResponse.isSuccess()) {
+                        System.out.println("the todo was updated: " +stateResponse.isSuccess());
+                        hideProgressDialog();
+                    }else{
+                        System.out.println("server rejected this action " +stateResponse.isSuccess());
+                        hideProgressDialog();
+                    }
+                }
+
+            }
+
+            @Override
+            public void onFailure(Call<JsonObject> call, Throwable t) {
+                System.out.println(t);
+                System.out.println("Something went wrong when trying to connect to the server");
+                hideProgressDialog();
+            }
+
+        });
     }
 
 }
