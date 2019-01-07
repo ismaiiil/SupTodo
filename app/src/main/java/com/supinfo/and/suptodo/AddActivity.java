@@ -55,7 +55,7 @@ public class AddActivity extends BaseActivity {
         );
 
         if(todoText.getText().toString().isEmpty()){
-            todoText.append(" = ");
+            todoText.append(" + ");
         }
         todoText.setImeOptions(EditorInfo.IME_ACTION_DONE);
         todoText.setRawInputType(InputType.TYPE_CLASS_TEXT);
@@ -64,7 +64,7 @@ public class AddActivity extends BaseActivity {
                 int start = Math.max(todoText.getSelectionStart(), 0);
                 int end = Math.max(todoText.getSelectionEnd(), 0);
                 todoText.getText().replace(Math.min(start, end), Math.max(start, end),
-                        "\n = ", 0, "\n = ".length());
+                        "\n + ", 0, "\n + ".length());
             }
             return false;
         });

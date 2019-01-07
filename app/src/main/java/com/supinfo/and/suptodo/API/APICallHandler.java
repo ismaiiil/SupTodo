@@ -212,14 +212,15 @@ public class APICallHandler {
             Gson gson = new Gson();
             @Override
             public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
-                System.out.println("finished calling API from testRead");
                 if (response.body().has("id")){
                     TodoResponse todoResponse = gson.fromJson(response.body(),TodoResponse.class);
-                    System.out.println("the todo is with id " + todoResponse.getId() + " and text " + todoResponse.getTodo());
+                    String message = "the todo is with id " + todoResponse.getId() + " was fetched ";
+                    Toast.makeText(baseActivity.getApplicationContext(),message,Toast.LENGTH_LONG).show();
                     myReadTodoCompletionHandler.onFinished(todoResponse);
                 } else if (response.body().has("message")){
                     MessageResponse messageResponse = gson.fromJson(response.body(),MessageResponse.class);
-                    System.out.println("the todo was not read: " + messageResponse.getMessage());
+                    String message = "the todo was not fetched: " + messageResponse.getMessage();
+                    Toast.makeText(baseActivity.getApplicationContext(),message,Toast.LENGTH_LONG).show();
                 }else{
                     StateResponse stateResponse = gson.fromJson(response.body(),StateResponse.class);
                     System.out.println("server rejected this action " +stateResponse.isSuccess());
@@ -229,8 +230,8 @@ public class APICallHandler {
 
             @Override
             public void onFailure(Call<JsonObject> call, Throwable t) {
-                System.out.println(t);
-                System.out.println("Something went wrong when trying to connect to the server");
+                String message = "Something went wrong when trying to connect to the server";
+                Toast.makeText(baseActivity.getApplicationContext(),message,Toast.LENGTH_LONG).show();
             }
 
         });
@@ -269,7 +270,6 @@ public class APICallHandler {
 
             @Override
             public void onFailure(Call<JsonObject> call, Throwable t) {
-                System.out.println(t);
                 String message = "Something went wrong when trying to connect to the server";
                 Toast.makeText(baseActivity.getApplicationContext(),message,Toast.LENGTH_LONG).show();
                 baseActivity.hideProgressDialog();
