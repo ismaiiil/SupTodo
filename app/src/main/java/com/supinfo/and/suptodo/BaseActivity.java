@@ -39,6 +39,7 @@ public class BaseActivity extends AppCompatActivity {
     UserDao userDao;
 
     public String LOGGED_USER_KEY = "LOGGED_USER_KEY";
+    public String PASSED_TODO = "PASSED_TODO";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

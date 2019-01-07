@@ -206,8 +206,7 @@ public class APICallHandler {
     }
 
 
-    public void readToDoByID(BaseActivity baseActivity,String username,String password, int id) {
-        baseActivity.showProgressDialog("refreshing List");
+    public void readToDoByID(BaseActivity baseActivity, String username, String password, int id, CompletionHandlers.MyReadTodoCompletionHandler myReadTodoCompletionHandler) {
         Call<JsonObject> call = userService.read(username,password,id);
         call.enqueue(new Callback<JsonObject>() {
             Gson gson = new Gson();
@@ -217,6 +216,7 @@ public class APICallHandler {
                 if (response.body().has("id")){
                     TodoResponse todoResponse = gson.fromJson(response.body(),TodoResponse.class);
                     System.out.println("the todo is with id " + todoResponse.getId() + " and text " + todoResponse.getTodo());
+                    myReadTodoCompletionHandler.onFinished(todoResponse);
                 } else if (response.body().has("message")){
                     MessageResponse messageResponse = gson.fromJson(response.body(),MessageResponse.class);
                     System.out.println("the todo was not read: " + messageResponse.getMessage());
@@ -240,7 +240,8 @@ public class APICallHandler {
 
 
     public void updateTodoByID(BaseActivity baseActivity,String username,String password, int id, String todo) {
-        baseActivity.showProgressDialog("Updating your todo!");
+        //baseActivity.showProgressDialog("Updating your todoa!");
+        Toast.makeText(baseActivity.getApplicationContext(),"Updating your todo!",Toast.LENGTH_SHORT).show();
         Call<JsonObject> call = userService.update(username,password,id,todo);
         call.enqueue(new Callback<JsonObject>() {
             Gson gson = new Gson();
@@ -250,17 +251,17 @@ public class APICallHandler {
                     MessageResponse messageResponse = gson.fromJson(response.body(),MessageResponse.class);
                     String message = "the todo was not updated: " + messageResponse.getMessage();
                     Toast.makeText(baseActivity.getApplicationContext(),message,Toast.LENGTH_LONG).show();
-                    baseActivity.hideProgressDialog();
+                    //baseActivity.hideProgressDialog();
                 }else{
                     StateResponse stateResponse = gson.fromJson(response.body(),StateResponse.class);
                     if (stateResponse.isSuccess()) {
                         String message = "the todo was updated: " +stateResponse.isSuccess();
                         Toast.makeText(baseActivity.getApplicationContext(),message,Toast.LENGTH_LONG).show();
-                        baseActivity.hideProgressDialog();
+                        //baseActivity.hideProgressDialog();
                     }else{
                         String message = "server rejected this action " +stateResponse.isSuccess();
                         Toast.makeText(baseActivity.getApplicationContext(),message,Toast.LENGTH_LONG).show();
-                        baseActivity.hideProgressDialog();
+                        //baseActivity.hideProgressDialog();
                     }
                 }
 

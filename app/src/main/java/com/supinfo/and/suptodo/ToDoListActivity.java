@@ -6,6 +6,7 @@ import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.text.InputType;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -37,22 +38,8 @@ public class ToDoListActivity extends BaseActivity {
         loggedUser = (UserResponse) getIntent().getSerializableExtra(LOGGED_USER_KEY);
         setTitle("Your Todo Lists: " + loggedUser.getLastname() + " " + loggedUser.getFirstname() );
 
-        getUIElements();
-
         refreshListViewFromAPI();
 
-        btnLogout.setOnClickListener(v ->
-                logoutAndCloseActivity()
-
-        );
-
-        btnAddToDoList.setOnClickListener(v ->
-                openAddActivity()
-        );
-
-        btnEditToDoList.setOnClickListener(v ->
-                openEditActivity()
-        );
         ListView multiListView = (ListView)findViewById(R.id.multiListView);
 
 
@@ -76,14 +63,11 @@ public class ToDoListActivity extends BaseActivity {
             ToDoItemAdapter multiListViewAdapter = new ToDoItemAdapter(this,todoResponses);
             multiListView.setAdapter(multiListViewAdapter);
         });
-        String[] todo = {"machin1 \n machin0.5", "machin2", "machin3", "machin4", "machin5", "machin6", "machin7", "machin8", "machin9", "machin10"};
-        ListAdapter multiListViewAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, todo);
         ListView multiListView = (ListView)findViewById(R.id.multiListView);
-        multiListView.setAdapter(multiListViewAdapter);
 
 
         multiListView.setOnItemClickListener((parent, view, position, id) -> {
-            openEditActivity();
+            openEditActivity((TodoResponse) parent.getItemAtPosition(position));
         });
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -93,7 +77,12 @@ public class ToDoListActivity extends BaseActivity {
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(view -> {
-            openAddActivity();
+            if(multiListView.getAdapter().getCount()==50){
+               fab.setActivated(false);
+            }else{
+                openAddActivity();
+            }
+
         });
     }
 
@@ -114,19 +103,13 @@ public class ToDoListActivity extends BaseActivity {
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_logout) {
             System.out.println("logout pressed");
-            exitApplication();
+            logoutAndCloseActivity();
             return true;
         }
 
         return super.onOptionsItemSelected(item);
     }
 
-    private void getUIElements(){
-
-//        btnLogout = (Button)findViewById(R.id.logoutBtn);
-//        btnAddToDoList = (Button)findViewById(R.id.addBtn);
-//        btnEditToDoList = (Button)findViewById(R.id.editBtn);
-    }
 
     public void logoutAndCloseActivity(){
         APIInstance.logoutUser(this,this);
@@ -138,13 +121,12 @@ public class ToDoListActivity extends BaseActivity {
         startActivity(intent);
     }
 
-    public void openEditActivity(){
+    public void openEditActivity(TodoResponse todoResponse){
         Intent intent = new Intent(this, EditActivity.class);
+        intent.putExtra(LOGGED_USER_KEY,new User(loggedUser.getUsername(),loggedUser.getPassword()));
+        intent.putExtra(PASSED_TODO,todoResponse);
         startActivity(intent);
     }
-
-
-
 
 
     // do this to windows you want back button to behave normally

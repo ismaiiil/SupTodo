@@ -63,6 +63,7 @@ public class ToDoItemAdapter extends ArrayAdapter<TodoResponse> {
 
             isShared.setTextColor(ContextCompat.getColor(mContext, R.color.colorAccent));
             isShared.setText("Private");
+            ownerOfTodoText.setText("My Private ToDo");
         }else{
             isShared.setTextColor(ContextCompat.getColor(mContext, R.color.colorPrimaryDark));
             isShared.setText("Shared");

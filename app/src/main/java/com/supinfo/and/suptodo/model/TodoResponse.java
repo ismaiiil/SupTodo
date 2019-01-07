@@ -1,6 +1,8 @@
 package com.supinfo.and.suptodo.model;
 
-public class TodoResponse {
+import java.io.Serializable;
+
+public class TodoResponse implements Serializable {
     private String id;
     private String lastupdate;
     private String usercreator;

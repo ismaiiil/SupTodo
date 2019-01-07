@@ -2,7 +2,9 @@ package com.supinfo.and.suptodo;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.InputType;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.EditText;
 
@@ -52,6 +54,20 @@ public class AddActivity extends BaseActivity {
                 })
         );
 
+        if(todoText.getText().toString().isEmpty()){
+            todoText.append(" = ");
+        }
+        todoText.setImeOptions(EditorInfo.IME_ACTION_DONE);
+        todoText.setRawInputType(InputType.TYPE_CLASS_TEXT);
+        todoText.setOnEditorActionListener((v, actionId, event) -> {
+            if (actionId == EditorInfo.IME_ACTION_DONE){
+                int start = Math.max(todoText.getSelectionStart(), 0);
+                int end = Math.max(todoText.getSelectionEnd(), 0);
+                todoText.getText().replace(Math.min(start, end), Math.max(start, end),
+                        "\n = ", 0, "\n = ".length());
+            }
+            return false;
+        });
     }
 
     //do this to windows you want back button to behave normally

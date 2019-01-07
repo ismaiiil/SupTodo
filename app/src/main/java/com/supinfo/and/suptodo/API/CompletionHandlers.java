@@ -12,4 +12,8 @@ public class CompletionHandlers {
     public interface MyTodoListCompletionHandler {
         void onFinished(List<TodoResponse> todoResponses);
     }
+
+    public interface MyReadTodoCompletionHandler{
+        void onFinished(TodoResponse todoResponse);
+    }
 }
