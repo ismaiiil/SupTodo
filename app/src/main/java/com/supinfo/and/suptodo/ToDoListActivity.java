@@ -3,6 +3,7 @@ package com.supinfo.and.suptodo;
 import android.content.Intent;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
@@ -105,6 +106,10 @@ public class ToDoListActivity extends BaseActivity {
             System.out.println("logout pressed");
             logoutAndCloseActivity();
             return true;
+        }else if (id == R.id.action_refresh){
+            System.out.println("refresh pressed");
+            refreshListViewFromAPI();
+            return true;
         }
 
         return super.onOptionsItemSelected(item);
@@ -112,7 +117,8 @@ public class ToDoListActivity extends BaseActivity {
 
 
     public void logoutAndCloseActivity(){
-        APIInstance.logoutUser(this,this);
+        AlertDialog alertDialog = logoutDialog();
+        alertDialog.show();
     }
 
     public void openAddActivity(){
@@ -126,6 +132,18 @@ public class ToDoListActivity extends BaseActivity {
         intent.putExtra(LOGGED_USER_KEY,new User(loggedUser.getUsername(),loggedUser.getPassword()));
         intent.putExtra(PASSED_TODO,todoResponse);
         startActivity(intent);
+    }
+
+    protected AlertDialog logoutDialog()
+    {
+        return new AlertDialog.Builder(this)
+                .setTitle("Logout?")
+                .setMessage("Are you sure you want to Logout?")
+                .setIcon(R.drawable.ic_launcher_foreground)
+                .setPositiveButton("Yes", (dialog, whichButton) -> APIInstance.logoutUser(this,this))
+                .setNegativeButton("No", (dialog, which) -> dialog.dismiss())
+                .create();
+
     }
 
 

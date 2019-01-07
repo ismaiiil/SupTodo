@@ -69,22 +69,22 @@ public class BaseActivity extends AppCompatActivity {
     }
     @Override
     public void onBackPressed() {
-        AlertDialog diaBox = AskOption();
+        AlertDialog diaBox = askOption();
         diaBox.show();
     }
 
-    private AlertDialog AskOption()
+    private AlertDialog askOption()
     {
-        AlertDialog myQuittingDialogBox =new AlertDialog.Builder(this)
+        return new AlertDialog.Builder(this)
                 .setTitle("Exit")
                 .setMessage("Are you sure you want to exit?")
                 .setIcon(R.drawable.ic_launcher_foreground)
                 .setPositiveButton("Yes", (dialog, whichButton) -> finishAffinity())
                 .setNegativeButton("No", (dialog, which) -> dialog.dismiss())
                 .create();
-        return myQuittingDialogBox;
 
     }
+
     public void startRegisterActivity(){
         startActivity(new Intent(this, RegisterActivity.class));
     }
