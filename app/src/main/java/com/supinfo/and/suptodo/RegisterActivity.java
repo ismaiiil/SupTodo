@@ -73,7 +73,7 @@ public class RegisterActivity extends BaseActivity {
             Toast.makeText(getApplicationContext(),"Incomplete form",Toast.LENGTH_LONG).show();
 
         }else{
-            registerUser(userName,password,firstName,lastName,email,this);
+            APIInstance.registerUser(this,userName,password,firstName,lastName,email,this);
         }
     }
 

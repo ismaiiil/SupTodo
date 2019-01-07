@@ -56,7 +56,7 @@ public class LoginActivity extends BaseActivity {
             Toast.makeText(getApplicationContext(),"You cannot leave empty fields",Toast.LENGTH_LONG).show();
 
         }else{
-            loginUser(new User(userNameLog,passwordLog),this);
+            APIInstance.loginUser(this,new User(userNameLog,passwordLog),this);
         }
     }
 

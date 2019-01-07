@@ -66,7 +66,7 @@ public class ToDoListActivity extends BaseActivity {
     }
 
     private void refreshListViewFromAPI() {
-        listFromAPI(loggedUser.getUsername(), loggedUser.getPassword(), todoResponses -> {
+        APIInstance.listFromAPI(this,loggedUser.getUsername(), loggedUser.getPassword(), todoResponses -> {
             ListView multiListView = (ListView) findViewById(R.id.multiListView);
             ToDoItemAdapter multiListViewAdapter = new ToDoItemAdapter(this,todoResponses);
             multiListView.setAdapter(multiListViewAdapter);
@@ -81,7 +81,7 @@ public class ToDoListActivity extends BaseActivity {
     }
 
     public void logoutAndCloseActivity(){
-        logoutUser(this);
+        APIInstance.logoutUser(this,this);
     }
 
     public void openAddActivity(){

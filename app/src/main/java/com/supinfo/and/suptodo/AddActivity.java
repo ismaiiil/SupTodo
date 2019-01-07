@@ -40,12 +40,12 @@ public class AddActivity extends BaseActivity {
         btnCancel.setOnClickListener(v -> finish());
 
         btnAdd.setOnClickListener(v ->
-                shareWithFriend(loggedUser.getUsername(), loggedUser.getPassword(), friendUserText.getText().toString(), wasShared -> {
+                APIInstance.shareWithFriend(this,loggedUser.getUsername(), loggedUser.getPassword(), friendUserText.getText().toString(), wasShared -> {
                     if(wasShared){
-                        listFromAPI(loggedUser.getUsername(), loggedUser.getPassword(), todoResponses -> {
+                        APIInstance.listFromAPI(this,loggedUser.getUsername(), loggedUser.getPassword(), todoResponses -> {
                              int id = Integer.parseInt(todoResponses.get(todoResponses.size()-1).getId()) ;
-                             String finalTodo = friendUserText.getText().toString() + "\n" + todoText.getText().toString();
-                             updateTodoByID(loggedUser.getUsername(),loggedUser.getPassword(),id,finalTodo);
+                             String finalTodo =loggedUser.getUsername() + " -> " + friendUserText.getText().toString() + "\n" + todoText.getText().toString();
+                            APIInstance.updateTodoByID(this,loggedUser.getUsername(),loggedUser.getPassword(),id,finalTodo);
                              finish();
                         });
                     }
