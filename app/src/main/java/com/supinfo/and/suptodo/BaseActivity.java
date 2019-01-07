@@ -89,6 +89,10 @@ public class BaseActivity extends AppCompatActivity {
         startActivity(new Intent(this, RegisterActivity.class));
     }
 
+    public void startLoginActivity(){
+        startActivity(new Intent(this, LoginActivity.class));
+    }
+
     User getCachedUser(GetUserCompletionHandler getUserCompletionHandler) throws ExecutionException, InterruptedException{
         return new SQLITEAsyncTasks.GetCachedUserAsyncTask(userDao,getUserCompletionHandler).execute().get();
     }

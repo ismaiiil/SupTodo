@@ -139,7 +139,7 @@ public class ToDoListActivity extends BaseActivity {
         return new AlertDialog.Builder(this)
                 .setTitle("Logout?")
                 .setMessage("Are you sure you want to Logout?")
-                .setIcon(R.drawable.ic_launcher_foreground)
+                .setIcon(R.drawable.ic_launcher_background)
                 .setPositiveButton("Yes", (dialog, whichButton) -> APIInstance.logoutUser(this,this))
                 .setNegativeButton("No", (dialog, which) -> dialog.dismiss())
                 .create();
@@ -147,7 +147,4 @@ public class ToDoListActivity extends BaseActivity {
     }
 
 
-    // do this to windows you want back button to behave normally
-//    @Override
-//    public void onBackPressed() {finish();}
 }

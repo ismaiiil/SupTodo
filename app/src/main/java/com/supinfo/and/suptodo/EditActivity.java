@@ -17,8 +17,9 @@ import com.supinfo.and.suptodo.model.TodoResponse;
 public class EditActivity extends BaseActivity {
 
     EditText todolist;
-    TextView userSharedwith;
+    EditText userSharedwith;
     TextView editTextInfo;
+    TextView title;
     User loggedUser;
     Boolean isEditing = false;
     Boolean isPaused = false;
@@ -32,8 +33,9 @@ public class EditActivity extends BaseActivity {
         setContentView(R.layout.activity_edit);
 
         todolist = (EditText) findViewById(R.id.listDisplayEdit);
-        userSharedwith = (TextView) findViewById(R.id.sharedWithEdit) ;
+        userSharedwith = (EditText) findViewById(R.id.editShared) ;
         editTextInfo = (TextView) findViewById(R.id.textInfoEdit);
+        title = (TextView) findViewById(R.id.textTitle);
         intentToDoResponse = (TodoResponse) getIntent().getSerializableExtra(PASSED_TODO);
         loggedUser = (User) getIntent().getSerializableExtra(LOGGED_USER_KEY);
 

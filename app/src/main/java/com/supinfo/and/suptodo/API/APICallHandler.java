@@ -31,7 +31,7 @@ public class APICallHandler {
         return INSTANCE;
     }
 
-    public void loginUser(BaseActivity baseActivity,User user, Activity caller ){
+    public void loginUser(BaseActivity baseActivity, User user, CompletionHandlers.MyLoginCompletionHandler mlCompletionHandler){
         baseActivity.showProgressDialog("Logging in");
         Call<JsonObject> call = userService.login(user.getUsername(),user.getPassword());
         call.enqueue(new Callback<JsonObject>() {
@@ -42,23 +42,18 @@ public class APICallHandler {
                     UserResponse userResponse = gson.fromJson(response.body(),UserResponse.class);
                     Intent intent = new Intent(baseActivity, ToDoListActivity.class);
                     intent.putExtra(baseActivity.LOGGED_USER_KEY,userResponse);
-                    //add logged user to SQLITE
-                    baseActivity.deleteAll(() -> baseActivity.insert(new User(userResponse.getUsername(),userResponse.getPassword())));
                     baseActivity.startActivity(intent);
                     baseActivity.hideProgressDialog();
-                    if(caller != null){
-                        caller.finish();
-                    }
+                    mlCompletionHandler.onSucceeded(true);
                 } else if (response.body().has("message")){
                     MessageResponse messageResponse = gson.fromJson(response.body(),MessageResponse.class);
                     baseActivity.hideProgressDialog();
-                    String message = "invalid credentials: " + messageResponse.getMessage();
-                    Toast.makeText(caller.getApplicationContext(),message,Toast.LENGTH_LONG).show();
+                    makeToast(baseActivity,"invalid credentials: " + messageResponse.getMessage());
+                    mlCompletionHandler.onSucceeded(false);
                 }else{
-                    //StateResponse stateResponse = gson.fromJson(response.body(),StateResponse.class);
-                    String message = "invalid info provided";
-                    Toast.makeText(caller.getApplicationContext(),message,Toast.LENGTH_LONG).show();
+                    makeToast(baseActivity,"invalid info provided");
                     baseActivity.hideProgressDialog();
+                    mlCompletionHandler.onSucceeded(false);
                 }
 
             }
@@ -66,10 +61,9 @@ public class APICallHandler {
             @Override
             public void onFailure(Call<JsonObject> call, Throwable t) {
                 System.out.println(t);
-                String message = "Something went wrong when trying to connect to the server";
-                Toast.makeText(caller.getApplicationContext(),message,Toast.LENGTH_LONG).show();
+                makeToast(baseActivity,"Something went wrong when trying to connect to the server");
                 baseActivity.hideProgressDialog();
-                caller.finishAffinity();
+                mlCompletionHandler.onFailed();
             }
 
         });
@@ -95,20 +89,17 @@ public class APICallHandler {
                     caller.finish();
                 } else if (response.body().has("message")){
                     MessageResponse messageResponse = gson.fromJson(response.body(),MessageResponse.class);
-                    String message = "You were not registered since: " + messageResponse.getMessage();
+                    makeToast(baseActivity,"You were not registered since: " + messageResponse.getMessage());
                     baseActivity.hideProgressDialog();
-                    Toast.makeText(caller.getApplicationContext(),message,Toast.LENGTH_LONG).show();
                 }else{
-                    String message = "invalid info provided";
+                    makeToast(baseActivity,"invalid info provided");
                     baseActivity.hideProgressDialog();
-                    Toast.makeText(caller.getApplicationContext(),message,Toast.LENGTH_LONG).show();
                 }
             }
 
             @Override
             public void onFailure(Call<JsonObject> call, Throwable t) {
-                String message = "Something went wrong when trying to connect to the server";
-                Toast.makeText(caller.getApplicationContext(),message,Toast.LENGTH_LONG).show();
+                makeToast(baseActivity,"Something went wrong when trying to connect to the server");
                 baseActivity.hideProgressDialog();
             }
         });
@@ -124,37 +115,34 @@ public class APICallHandler {
                 baseActivity.startRegisterActivity();
                 baseActivity.deleteAll(null);
                 caller.finish();
-                String message = "You were sucessfully logged out: " + response.body().isSuccess();
-                Toast.makeText(caller.getApplicationContext(),message,Toast.LENGTH_LONG).show();
+                makeToast(baseActivity,"You were sucessfully logged out: " + response.body().isSuccess());
             }
 
             @Override
             public void onFailure(Call<StateResponse> call, Throwable t) {
-                System.out.println(t);
-                String message = "Something went wrong when trying to connect to the server";
+                makeToast(baseActivity,"Something went wrong when trying to connect to the server");
                 baseActivity.startRegisterActivity();
                 baseActivity.deleteAll(null);
-                Toast.makeText(baseActivity.getApplicationContext(),message,Toast.LENGTH_LONG).show();
                 caller.finish();
             }
         });
     }
 
-    public void listFromAPI(BaseActivity baseActivity,String username,String password, CompletionHandlers.MyTodoListCompletionHandler myListener){
+    public void listFromAPI(BaseActivity baseActivity,String username,String password, CompletionHandlers.MyTodoListCompletionHandler completionHandler){
         baseActivity.showProgressDialog("Refreshing");
         Call<List<TodoResponse>> call = userService.list(username,password);
         call.enqueue(new Callback<List<TodoResponse>>() {
             @Override
             public void onResponse(Call<List<TodoResponse>> call, Response<List<TodoResponse>> response) {
-                myListener.onFinished(response.body());
+                completionHandler.onFinished(response.body());
                 baseActivity.hideProgressDialog();
 
             }
             @Override
             public void onFailure(Call<List<TodoResponse>> call, Throwable t) {
                 System.out.println(t);
-                String message = "Something went wrong when trying to fetch the list from the server!";
-                Toast.makeText(baseActivity.getApplicationContext(),message,Toast.LENGTH_LONG).show();
+                makeToast(baseActivity,"Something went wrong when trying to fetch the list from the server!");
+
                 baseActivity.hideProgressDialog();
             }
         });
@@ -173,20 +161,17 @@ public class APICallHandler {
             public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
                 if (response.body().has("message")){
                     MessageResponse messageResponse = gson.fromJson(response.body(),MessageResponse.class);
-                    String message = "the todo was not shared: " + messageResponse.getMessage();
-                    Toast.makeText(baseActivity.getApplicationContext(),message,Toast.LENGTH_LONG).show();
+                    makeToast(baseActivity,"the todo was not shared: " + messageResponse.getMessage());
                     shareCH.onFinished(false);
                     baseActivity.hideProgressDialog();
                 }else{
                     StateResponse stateResponse = gson.fromJson(response.body(),StateResponse.class);
                     if (stateResponse.isSuccess()) {
-                        String message = "the todo was shared: " +stateResponse.isSuccess();
-                        Toast.makeText(baseActivity.getApplicationContext(),message,Toast.LENGTH_LONG).show();
+                        makeToast(baseActivity,"the todo was shared: " +stateResponse.isSuccess());
                         shareCH.onFinished(true);
                         baseActivity.hideProgressDialog();
                     }else{
-                        String message = "server rejected this action " +stateResponse.isSuccess();
-                        Toast.makeText(baseActivity.getApplicationContext(),message,Toast.LENGTH_LONG).show();
+                        makeToast(baseActivity,"server rejected this action " +stateResponse.isSuccess());
                         shareCH.onFinished(false);
                         baseActivity.hideProgressDialog();
                     }
@@ -196,9 +181,7 @@ public class APICallHandler {
 
             @Override
             public void onFailure(Call<JsonObject> call, Throwable t) {
-                System.out.println(t);
-                String message = "Something went wrong when trying to connect to the server";
-                Toast.makeText(baseActivity.getApplicationContext(),message,Toast.LENGTH_LONG).show();
+                makeToast(baseActivity,"Something went wrong when trying to connect to the server");
                 baseActivity.hideProgressDialog();
             }
 
@@ -214,24 +197,21 @@ public class APICallHandler {
             public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
                 if (response.body().has("id")){
                     TodoResponse todoResponse = gson.fromJson(response.body(),TodoResponse.class);
-                    String message = "the todo is with id " + todoResponse.getId() + " was fetched ";
-                    Toast.makeText(baseActivity.getApplicationContext(),message,Toast.LENGTH_LONG).show();
+                    makeToast(baseActivity,"the todo is with id " + todoResponse.getId() + " was fetched ");
                     myReadTodoCompletionHandler.onFinished(todoResponse);
                 } else if (response.body().has("message")){
                     MessageResponse messageResponse = gson.fromJson(response.body(),MessageResponse.class);
-                    String message = "the todo was not fetched: " + messageResponse.getMessage();
-                    Toast.makeText(baseActivity.getApplicationContext(),message,Toast.LENGTH_LONG).show();
+                    makeToast(baseActivity,"the todo was not fetched: " + messageResponse.getMessage());
                 }else{
                     StateResponse stateResponse = gson.fromJson(response.body(),StateResponse.class);
-                    System.out.println("server rejected this action " +stateResponse.isSuccess());
+                    makeToast(baseActivity,"server rejected this action " +stateResponse.isSuccess());
                 }
 
             }
 
             @Override
             public void onFailure(Call<JsonObject> call, Throwable t) {
-                String message = "Something went wrong when trying to connect to the server";
-                Toast.makeText(baseActivity.getApplicationContext(),message,Toast.LENGTH_LONG).show();
+                makeToast(baseActivity,"Something went wrong when trying to connect to the server");
             }
 
         });
@@ -241,7 +221,6 @@ public class APICallHandler {
 
 
     public void updateTodoByID(BaseActivity baseActivity,String username,String password, int id, String todo) {
-        //baseActivity.showProgressDialog("Updating your todoa!");
         Toast.makeText(baseActivity.getApplicationContext(),"Updating your todo!",Toast.LENGTH_SHORT).show();
         Call<JsonObject> call = userService.update(username,password,id,todo);
         call.enqueue(new Callback<JsonObject>() {
@@ -250,19 +229,13 @@ public class APICallHandler {
             public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
                 if (response.body().has("message")){
                     MessageResponse messageResponse = gson.fromJson(response.body(),MessageResponse.class);
-                    String message = "the todo was not updated: " + messageResponse.getMessage();
-                    Toast.makeText(baseActivity.getApplicationContext(),message,Toast.LENGTH_LONG).show();
-                    //baseActivity.hideProgressDialog();
+                    makeToast(baseActivity,"the todo was not updated: " + messageResponse.getMessage());
                 }else{
                     StateResponse stateResponse = gson.fromJson(response.body(),StateResponse.class);
                     if (stateResponse.isSuccess()) {
-                        String message = "the todo was updated: " +stateResponse.isSuccess();
-                        Toast.makeText(baseActivity.getApplicationContext(),message,Toast.LENGTH_LONG).show();
-                        //baseActivity.hideProgressDialog();
+                        makeToast(baseActivity,"the todo was updated: " +stateResponse.isSuccess());
                     }else{
-                        String message = "server rejected this action " +stateResponse.isSuccess();
-                        Toast.makeText(baseActivity.getApplicationContext(),message,Toast.LENGTH_LONG).show();
-                        //baseActivity.hideProgressDialog();
+                        makeToast(baseActivity,"server rejected this action " +stateResponse.isSuccess());
                     }
                 }
 
@@ -270,12 +243,16 @@ public class APICallHandler {
 
             @Override
             public void onFailure(Call<JsonObject> call, Throwable t) {
-                String message = "Something went wrong when trying to connect to the server";
-                Toast.makeText(baseActivity.getApplicationContext(),message,Toast.LENGTH_LONG).show();
+               makeToast(baseActivity,"Something went wrong when trying to connect to the server");
+
                 baseActivity.hideProgressDialog();
             }
 
         });
+    }
+
+    public void makeToast(Activity activity,String message){
+        Toast.makeText(activity.getApplicationContext(),message,Toast.LENGTH_LONG).show();
     }
 }
 

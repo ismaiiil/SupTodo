@@ -7,6 +7,7 @@ import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
+import com.supinfo.and.suptodo.API.CompletionHandlers;
 import com.supinfo.and.suptodo.SQLITE.User;
 import com.supinfo.and.suptodo.SQLITE.UserDao;
 import com.supinfo.and.suptodo.SQLITE.UserRoomDatabase;
@@ -24,7 +25,17 @@ public class LaunchActivity extends BaseActivity {
         try {
             getCachedUser(user -> {
                 if(user != null){
-                    APIInstance.loginUser(this,user,null);
+                    APIInstance.loginUser(this, user, new CompletionHandlers.MyLoginCompletionHandler() {
+                        @Override
+                        public void onSucceeded(Boolean wasAuthenticated) {
+                            loginNotAuth(wasAuthenticated);
+                        }
+
+                        @Override
+                        public void onFailed() {
+                            loginFailed(user);
+                        }
+                    });
                 }else{
                     startRegisterActivity();
                 }
@@ -36,6 +47,21 @@ public class LaunchActivity extends BaseActivity {
             e.printStackTrace();
         }
 
+    }
+
+    private void loginNotAuth(boolean wasAuthenticated){
+        if(!wasAuthenticated){
+            startRegisterActivity();
+            APIInstance.makeToast(this,"Your credentials are no more valid!");
+        }
+    }
+
+    private void loginFailed(User user){
+
+        Intent intent = new Intent(this, LoginActivity.class);
+        intent.putExtra(LOGGED_USER_KEY,new User(user.getUsername(),user.getPassword()));
+        startActivity(intent);
+        APIInstance.makeToast(this,"Server did not respond to Login");
     }
 
 }

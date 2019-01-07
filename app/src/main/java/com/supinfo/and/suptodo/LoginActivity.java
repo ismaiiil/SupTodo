@@ -10,6 +10,7 @@ import android.widget.Toast;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.supinfo.and.suptodo.API.ApiUtil;
+import com.supinfo.and.suptodo.API.CompletionHandlers;
 import com.supinfo.and.suptodo.API.UserService;
 import com.supinfo.and.suptodo.SQLITE.User;
 import com.supinfo.and.suptodo.model.MessageResponse;
@@ -41,6 +42,11 @@ public class LoginActivity extends BaseActivity {
 
         btnRegisterIns.setOnClickListener(v -> returnToPreviousActivity());
 
+        User loggedUser = (User) getIntent().getSerializableExtra(LOGGED_USER_KEY);
+        if(loggedUser != null){
+            editUserNameLog.setText(loggedUser.getUsername());
+            editPasswordLog.setText(loggedUser.getPassword());
+        }
 
     }
 
@@ -56,10 +62,23 @@ public class LoginActivity extends BaseActivity {
             Toast.makeText(getApplicationContext(),"You cannot leave empty fields",Toast.LENGTH_LONG).show();
 
         }else{
-            APIInstance.loginUser(this,new User(userNameLog,passwordLog),this);
+            APIInstance.loginUser(this, new User(userNameLog, passwordLog), new CompletionHandlers.MyLoginCompletionHandler() {
+                @Override
+                public void onSucceeded(Boolean wasAuthenticated) {
+                    if(wasAuthenticated){
+                        userValidated(userNameLog,passwordLog);
+                    }
+                }
+                @Override
+                public void onFailed() {}
+            });
         }
     }
 
+    private void userValidated(String userNameLog, String passwordLog){
+        deleteAll(() -> insert(new User(userNameLog,passwordLog)));
+        this.finish();
+    }
 
     public void returnToPreviousActivity(){
         startActivity(new Intent(LoginActivity.this, RegisterActivity.class));

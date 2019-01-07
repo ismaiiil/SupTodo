@@ -9,6 +9,12 @@ public class CompletionHandlers {
         void onFinished(Boolean wasShared);
     }
 
+    public interface MyLoginCompletionHandler{
+        void onSucceeded(Boolean wasAuthenticated);
+        void onFailed();
+    }
+
+
     public interface MyTodoListCompletionHandler {
         void onFinished(List<TodoResponse> todoResponses);
     }
