@@ -1,5 +1,6 @@
 package com.supinfo.and.suptodo;
 
+import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -8,7 +9,7 @@ import android.os.AsyncTask;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.widget.ProgressBar;
+import android.widget.ListView;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
@@ -19,6 +20,8 @@ import com.supinfo.and.suptodo.SQLITE.User;
 import com.supinfo.and.suptodo.SQLITE.UserDao;
 import com.supinfo.and.suptodo.SQLITE.UserRoomDatabase;
 import com.supinfo.and.suptodo.model.MessageResponse;
+import com.supinfo.and.suptodo.model.StateResponse;
+import com.supinfo.and.suptodo.model.TodoResponse;
 import com.supinfo.and.suptodo.model.UserResponse;
 
 import java.lang.ref.WeakReference;
@@ -34,6 +37,8 @@ public class BaseActivity extends AppCompatActivity {
     UserService userService = ApiUtil.getUserService();
     UserDao userDao;
     User cachedUser;
+
+    public String LOGGED_USER_KEY = "LOGGED_USER_KEY";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,26 +78,14 @@ public class BaseActivity extends AppCompatActivity {
                 .setTitle("Exit")
                 .setMessage("Are you sure you want to exit?")
                 .setIcon(R.drawable.ic_launcher_foreground)
-                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int whichButton) {
-                        finishAffinity();
-                    }
-                })
-                .setNegativeButton("No", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                    }
-                })
+                .setPositiveButton("Yes", (dialog, whichButton) -> finishAffinity())
+                .setNegativeButton("No", (dialog, which) -> dialog.dismiss())
                 .create();
         return myQuittingDialogBox;
 
     }
     public void startRegisterActivity(){
         startActivity(new Intent(this, RegisterActivity.class));
-    }
-
-    public void startTodoListActivity(){
-        startActivity(new Intent(this, ToDoListActivity.class));
     }
 
     User getCachedUser() throws ExecutionException, InterruptedException{
@@ -103,9 +96,9 @@ public class BaseActivity extends AppCompatActivity {
         new InsertAsyncTask(userDao).execute(user);
     }
 
-    public void deleteAllAndInsert(User user){
-        new DeleteAndInsertAsyncTask(userDao,this,user).execute();
-    }
+    public void deleteAllAndInsert(User user){ new DeleteAndInsertAsyncTask(userDao,this,user).execute(); }
+
+    public void deleteAll(){ new DeleteAllAsyncTask(userDao).execute(); }
 
     private static class DeleteAndInsertAsyncTask extends AsyncTask<User, Void, Void> {
 
@@ -148,6 +141,23 @@ public class BaseActivity extends AppCompatActivity {
 
     }
 
+    private static class DeleteAllAsyncTask extends AsyncTask<Void, Void, Void> {
+
+        private UserDao mAsyncTaskDao;
+
+        DeleteAllAsyncTask(UserDao dao) {
+            mAsyncTaskDao = dao;
+        }
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            mAsyncTaskDao.deleteAll();
+            return null;
+        }
+
+
+    }
+
     private static class GetCachedUserAsyncTask extends android.os.AsyncTask<Void, Void, User> {
 
         private UserDao mAsyncTaskDao;
@@ -167,7 +177,7 @@ public class BaseActivity extends AppCompatActivity {
         protected void onPostExecute(User user) {
             super.onPostExecute(user);
             if(user != null){
-                baseActivity.get().loginUser(user);
+                baseActivity.get().loginUser(user,null);
             }else{
                 baseActivity.get().startRegisterActivity();
             }
@@ -175,7 +185,7 @@ public class BaseActivity extends AppCompatActivity {
         }
     }
 
-    protected void loginUser(User user){
+    protected void loginUser(User user,Activity caller){
         Call<JsonObject> call = userService.login(user.getUsername(),user.getPassword());
         showProgressDialog("Logging in");
         call.enqueue(new Callback<JsonObject>() {
@@ -185,15 +195,18 @@ public class BaseActivity extends AppCompatActivity {
                 if (response.body().has("id")){
                     UserResponse userResponse = gson.fromJson(response.body(),UserResponse.class);
                     Intent intent = new Intent(BaseActivity.this, ToDoListActivity.class);
+                    intent.putExtra(LOGGED_USER_KEY,userResponse);
                     //add logged user to SQLITE
                     deleteAllAndInsert(new User(userResponse.getUsername(),userResponse.getPassword()));
                     startActivity(intent);
                     hideProgressDialog();
-                    //finish();
+                    if(caller != null){
+                        caller.finish();
+                    }
                 } else if (response.body().has("message")){
                     MessageResponse messageResponse = gson.fromJson(response.body(),MessageResponse.class);
-                    String message = "invalid credentials: " + messageResponse.getMessage();
                     hideProgressDialog();
+                    String message = "invalid credentials: " + messageResponse.getMessage();
                     Toast.makeText(getApplicationContext(),message,Toast.LENGTH_LONG).show();
                 }else{
                     //StateResponse stateResponse = gson.fromJson(response.body(),StateResponse.class);
@@ -210,13 +223,14 @@ public class BaseActivity extends AppCompatActivity {
                 String message = "Something went wrong when trying to connect to the server";
                 Toast.makeText(getApplicationContext(),message,Toast.LENGTH_LONG).show();
                 hideProgressDialog();
+                caller.finishAffinity();
             }
 
         });
     }
 
     protected void registerUser(String userName,String password,String firstName,
-                                String lastName,String email){
+                                String lastName,String email,Activity caller){
         Call<JsonObject> call = userService.register(userName,password,firstName,
                 lastName,email);
         System.out.println("calling api from testRegister");
@@ -232,8 +246,10 @@ public class BaseActivity extends AppCompatActivity {
                     //add registered user to SQLITE
                     deleteAllAndInsert(new User(userResponse.getUsername(),userResponse.getPassword()));
                     Intent intent = new Intent(BaseActivity.this, ToDoListActivity.class);
+                    intent.putExtra(LOGGED_USER_KEY,userResponse);
                     startActivity(intent);
                     hideProgressDialog();
+                    caller.finish();
                 } else if (response.body().has("message")){
                     MessageResponse messageResponse = gson.fromJson(response.body(),MessageResponse.class);
                     String message = "You were not registered since: " + messageResponse.getMessage();
@@ -251,8 +267,62 @@ public class BaseActivity extends AppCompatActivity {
             public void onFailure(Call<JsonObject> call, Throwable t) {
                 System.out.println(t);
                 String message = "Something went wrong when trying to connect to the server";
+                Toast.makeText(getApplicationContext(),message,Toast.LENGTH_LONG).show();
                 hideProgressDialog();
             }
         });
     }
+
+    protected void logoutUser(Activity caller){
+        showProgressDialog("Logging Out");
+        Call<StateResponse> call = userService.logout();
+        System.out.println("calling api from testLogout");
+        call.enqueue(new Callback<StateResponse>() {
+            @Override
+            public void onResponse(Call<StateResponse> call, Response<StateResponse> response) {
+                hideProgressDialog();
+                System.out.println("finished calling API from testLogout");
+                startRegisterActivity();
+                deleteAll();
+                caller.finish();
+                String message = "You were sucessfully logged out: " + response.body().isSuccess();
+                Toast.makeText(getApplicationContext(),message,Toast.LENGTH_LONG).show();
+            }
+
+            @Override
+            public void onFailure(Call<StateResponse> call, Throwable t) {
+                System.out.println(t);
+                String message = "Something went wrong when trying to connect to the server";
+                startRegisterActivity();
+                deleteAll();
+                Toast.makeText(getApplicationContext(),message,Toast.LENGTH_LONG).show();
+                caller.finish();
+            }
+        });
+    }
+
+    protected void listFromAPIAndUpdateListView(String username,String password, ToDoListActivity toDoListActivity){
+        showProgressDialog("Refreshing");
+        Call<List<TodoResponse>> call = userService.list(username,password);
+        System.out.println("calling api from testList");
+        call.enqueue(new Callback<List<TodoResponse>>() {
+            @Override
+            public void onResponse(Call<List<TodoResponse>> call, Response<List<TodoResponse>> response) {
+                ListView multiListView = (ListView)findViewById(R.id.multiListView);
+                ToDoItemAdapter multiListViewAdapter = new ToDoItemAdapter(toDoListActivity,response.body());
+                multiListView.setAdapter(multiListViewAdapter);
+                System.out.println("finished calling API from testList");
+                System.out.println();
+                hideProgressDialog();
+            }
+            @Override
+            public void onFailure(Call<List<TodoResponse>> call, Throwable t) {
+                System.out.println(t);
+                System.out.println("Something went wrong when trying to connect to the server");
+                hideProgressDialog();
+            }
+        });
+
+    }
+
 }

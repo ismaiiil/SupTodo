@@ -3,7 +3,7 @@ package com.supinfo.and.suptodo;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
-public class AddActivity extends AppCompatActivity {
+public class AddActivity extends BaseActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

@@ -1,29 +1,41 @@
 package com.supinfo.and.suptodo;
 
 import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.widget.ArrayAdapter;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.Button;
+import android.widget.Toast;
+
+import com.supinfo.and.suptodo.model.TodoResponse;
+import com.supinfo.and.suptodo.model.UserResponse;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class ToDoListActivity extends BaseActivity {
 
     private Button btnLogout;
     private Button btnAddToDoList;
     private Button btnEditToDoList;
-
+    private UserResponse loggedUser;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_to_do_list);
-        setTitle(R.string.title_activity_todolist);
+        loggedUser = (UserResponse) getIntent().getSerializableExtra(LOGGED_USER_KEY);
+        setTitle("Your Todo Lists: " + loggedUser.getLastname() + " " + loggedUser.getFirstname() );
 
         getUIElements();
 
+        listFromAPIAndUpdateListView(loggedUser.getUsername(),loggedUser.getPassword(),this);
         btnLogout.setOnClickListener(v ->
-                exitApplication()
+                logoutAndCloseActivity()
 
         );
 
@@ -34,11 +46,15 @@ public class ToDoListActivity extends BaseActivity {
         btnEditToDoList.setOnClickListener(v ->
                 openEditActivity()
         );
-
-        String[] todo = {"machin1 \n machin0.5", "machin2", "machin3", "machin4", "machin5", "machin6", "machin7", "machin8", "machin9", "machin10"};
-        ListAdapter multiListViewAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, todo);
         ListView multiListView = (ListView)findViewById(R.id.multiListView);
-        multiListView.setAdapter(multiListViewAdapter);
+
+
+        multiListView.setOnItemClickListener((parent, view, position, id) -> {
+            view.setSelected(true);
+            TodoResponse mTodoResponse = (TodoResponse) parent.getItemAtPosition(position);
+            Toast.makeText(getBaseContext(),"id selected is " + mTodoResponse.getId(),Toast.LENGTH_LONG).show();
+        });
+
     }
 
     private void getUIElements(){
@@ -48,9 +64,8 @@ public class ToDoListActivity extends BaseActivity {
         btnEditToDoList = (Button)findViewById(R.id.editBtn);
     }
 
-    public void exitApplication(){
-        moveTaskToBack(true);
-        android.os.Process.killProcess(android.os.Process.myPid());
+    public void logoutAndCloseActivity(){
+        logoutUser(this);
     }
 
     public void openAddActivity(){
@@ -64,7 +79,10 @@ public class ToDoListActivity extends BaseActivity {
     }
 
 
-// do this to windows you want back button to behave normally
+
+
+
+    // do this to windows you want back button to behave normally
 //    @Override
 //    public void onBackPressed() {finish();}
 }

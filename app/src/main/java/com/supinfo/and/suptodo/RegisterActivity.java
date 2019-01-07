@@ -44,9 +44,6 @@ public class RegisterActivity extends BaseActivity {
         setContentView(R.layout.activity_register);
         setTitle(R.string.title_activity_register);
 
-        testList();
-
-
         getUIElements();
 
         btnRegister.setOnClickListener((v) ->
@@ -76,7 +73,7 @@ public class RegisterActivity extends BaseActivity {
             Toast.makeText(getApplicationContext(),"Incomplete form",Toast.LENGTH_LONG).show();
 
         }else{
-            registerUser(userName,password,firstName,lastName,email);
+            registerUser(userName,password,firstName,lastName,email,this);
         }
     }
 
@@ -175,48 +172,9 @@ public class RegisterActivity extends BaseActivity {
     }
 
 
-    private void testLogout(){
-        Call<StateResponse> call = userService.logout();
-        System.out.println("calling api from testLogout");
-        call.enqueue(new Callback<StateResponse>() {
-            @Override
-            public void onResponse(Call<StateResponse> call, Response<StateResponse> response) {
-                System.out.println("finished calling API from testLogout");
-                System.out.println("You were sucessfully logged out: " + response.body().isSuccess());
-            }
-
-            @Override
-            public void onFailure(Call<StateResponse> call, Throwable t) {
-                System.out.println(t);
-                System.out.println("Something went wrong when trying to connect to the server");
-            }
-        });
-    }
 
 
-    private void testList(){
-        Call<List<TodoResponse>> call = userService.list("userone","test");
-        System.out.println("calling api from testList");
-        call.enqueue(new Callback<List<TodoResponse>>() {
-            @Override
-            public void onResponse(Call<List<TodoResponse>> call, Response<List<TodoResponse>> response) {
-                System.out.println("finished calling API from testList");
-                for(TodoResponse todoResponse:response.body()){
-                    System.out.print(todoResponse.getId() + " " + todoResponse.getLastupdate() + " " + todoResponse.getTodo() + ", ");
-                }
-                System.out.println();
 
-            }
-
-            @Override
-            public void onFailure(Call<List<TodoResponse>> call, Throwable t) {
-                System.out.println(t);
-                System.out.println("Something went wrong when trying to connect to the server");
-            }
-
-        });
-
-    }
 
     public void openLoginActivity(){
         Intent intent = new Intent(this, LoginActivity.class);

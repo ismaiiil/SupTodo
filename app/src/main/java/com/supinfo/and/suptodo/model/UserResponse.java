@@ -1,6 +1,8 @@
 package com.supinfo.and.suptodo.model;
 
-public class UserResponse {
+import java.io.Serializable;
+
+public class UserResponse implements Serializable {
     private String id;
     private String username;
     private String password;
