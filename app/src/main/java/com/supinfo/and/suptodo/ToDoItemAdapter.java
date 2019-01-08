@@ -49,11 +49,14 @@ public class ToDoItemAdapter extends ArrayAdapter<TodoResponse> {
         if (totalString.contains("\n")){
             String[] result = totalString.split("\n", 2);
             String ownerString = result[0];
+            if(ownerString.equals("")){
+                ownerString = todoResponse.getUserinvited();
+            }
             String todosString = result[1];
             ownerOfTodoText.setText(ownerString);
             todoText.setText(todosString);
         }else{
-            String ownerString = "";
+            String ownerString = todoResponse.getUserinvited();
             String todosString = todoResponse.getTodo();
             ownerOfTodoText.setText(ownerString);
             todoText.setText(todosString);

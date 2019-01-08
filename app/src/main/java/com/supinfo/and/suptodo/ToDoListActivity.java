@@ -37,7 +37,7 @@ public class ToDoListActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_to_do_list);
         loggedUser = (UserResponse) getIntent().getSerializableExtra(LOGGED_USER_KEY);
-        setTitle("Your Todo Lists: " + loggedUser.getLastname() + " " + loggedUser.getFirstname() );
+
 
         refreshListViewFromAPI();
 
@@ -74,7 +74,7 @@ public class ToDoListActivity extends BaseActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        setTitle("Your todo lists:");
+        setTitle("ID: " + loggedUser.getId() + " Username: " + loggedUser.getUsername() );
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(view -> {
