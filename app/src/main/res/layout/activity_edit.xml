@@ -11,51 +11,48 @@
         android:id="@+id/textInfoEdit"
         android:layout_width="346dp"
         android:layout_height="30dp"
-        android:layout_marginBottom="480dp"
-        android:layout_marginEnd="243dp"
         android:layout_marginStart="83dp"
         android:layout_marginTop="10dp"
+        android:layout_marginEnd="243dp"
         android:text="@string/defaultEditTitle"
         android:textAppearance="@style/TextAppearance.AppCompat.Title"
         android:textSize="17sp"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.222"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.127" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/textTitle"
         android:layout_width="53dp"
         android:layout_height="38dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="24dp"
+        android:layout_marginEnd="8dp"
         android:text="@string/textfieldTitletext"
         android:textSize="16sp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textInfoEdit" />
+        app:layout_constraintBottom_toBottomOf="@+id/editShared"
+        app:layout_constraintEnd_toStartOf="@+id/editShared" />
 
     <EditText
         android:id="@+id/editShared"
         style="@android:style/Widget.Holo.Light.AutoCompleteTextView"
         android:layout_width="276dp"
         android:layout_height="55dp"
-        android:layout_marginStart="84dp"
         android:layout_marginTop="8dp"
+        android:layout_marginEnd="19dp"
         android:ems="10"
         android:inputType="textPersonName"
         android:singleLine="false"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textInfoEdit" />
 
     <EditText
         android:id="@+id/listDisplayEdit"
         android:layout_width="312dp"
-        android:layout_height="348dp"
-        android:layout_marginEnd="8dp"
+        android:layout_height="0dp"
         android:layout_marginStart="11dp"
         android:layout_marginTop="40dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="8dp"
         android:ems="10"
         android:gravity="top"
         android:imeActionId="6"
@@ -64,6 +61,7 @@
         android:singleLine="false"
         android:textAppearance="@style/TextAppearance.AppCompat.Body2"
         android:textSize="17sp"
+        app:layout_constraintBottom_toTopOf="@+id/cancelBtnEdit"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.471"
         app:layout_constraintStart_toStartOf="parent"
@@ -74,21 +72,21 @@
         android:layout_width="90dp"
         android:layout_height="40dp"
         android:layout_marginStart="36dp"
-        android:layout_marginTop="32dp"
+        android:layout_marginBottom="8dp"
         android:text="@string/BtnUpdateText"
         android:textSize="16sp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/listDisplayEdit" />
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
     <Button
         android:id="@+id/cancelBtnEdit"
         android:layout_width="90dp"
         android:layout_height="40dp"
         android:layout_marginEnd="32dp"
-        android:layout_marginTop="32dp"
+        android:layout_marginBottom="8dp"
         android:text="@string/BtnBackText"
         android:textSize="16sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/listDisplayEdit" />
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
 </android.support.constraint.ConstraintLayout>
