@@ -1,25 +1,12 @@
 package com.supinfo.and.suptodo;
 
 import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
-
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
-import com.supinfo.and.suptodo.API.ApiUtil;
 import com.supinfo.and.suptodo.API.CompletionHandlers;
-import com.supinfo.and.suptodo.API.UserService;
 import com.supinfo.and.suptodo.SQLITE.User;
-import com.supinfo.and.suptodo.model.MessageResponse;
-import com.supinfo.and.suptodo.model.StateResponse;
-import com.supinfo.and.suptodo.model.UserResponse;
-
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
 
 public class LoginActivity extends BaseActivity {
@@ -28,8 +15,6 @@ public class LoginActivity extends BaseActivity {
     private EditText editPasswordLog;
     private Button btnLogin;
     private Button btnRegisterIns;
-
-    UserService userService = ApiUtil.getUserService();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,10 +36,10 @@ public class LoginActivity extends BaseActivity {
     }
 
     private void getUIElements() {
-        editUserNameLog = (EditText)findViewById(R.id.userNameLog);
-        editPasswordLog = (EditText)findViewById(R.id.passwordLog);
-        btnLogin = (Button)findViewById(R.id.loginBtn);
-        btnRegisterIns = (Button)findViewById(R.id.registerInsBtn);
+        editUserNameLog = findViewById(R.id.userNameLog);
+        editPasswordLog = findViewById(R.id.passwordLog);
+        btnLogin = findViewById(R.id.loginBtn);
+        btnRegisterIns = findViewById(R.id.registerInsBtn);
     }
 
     public void validateFields(String userNameLog, String passwordLog){

@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.InputType;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.EditText;
@@ -16,8 +15,8 @@ import com.supinfo.and.suptodo.model.TodoResponse;
 
 public class EditActivity extends BaseActivity {
 
-    EditText todolist;
-    EditText userSharedwith;
+    EditText todoList;
+    EditText userSharedWith;
     TextView editTextInfo;
     TextView title;
     User loggedUser;
@@ -31,53 +30,51 @@ public class EditActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit);
-
-        todolist = (EditText) findViewById(R.id.listDisplayEdit);
-        userSharedwith = (EditText) findViewById(R.id.editShared) ;
-        editTextInfo = (TextView) findViewById(R.id.textInfoEdit);
-        title = (TextView) findViewById(R.id.textTitle);
-        intentToDoResponse = (TodoResponse) getIntent().getSerializableExtra(PASSED_TODO);
-        loggedUser = (User) getIntent().getSerializableExtra(LOGGED_USER_KEY);
-
+        getUIElements();
+        getIntentData();
         setFields();
-
         if(intentToDoResponse.getUserinvited() != null){
             automateUpdateView();
         }else{
-            editTextInfo.setText("Your Private Todo List: ");
+            editTextInfo.setText(R.string.EditPrivateTODOInfo);
+
         }
-
-
-
-        Button updatebtn = (Button) findViewById(R.id.updateBtnEdit);
-        updatebtn.setOnClickListener(v -> {
+        Button updateBtn = findViewById(R.id.updateBtnEdit);
+        updateBtn.setOnClickListener(v -> {
             APIInstance.updateTodoByID(this,loggedUser.getUsername(),loggedUser.getPassword()
-                    ,Integer.parseInt(intentToDoResponse.getId()), userSharedwith.getText() + "\n" + todolist.getText().toString() );
+                    ,Integer.parseInt(intentToDoResponse.getId()), userSharedWith.getText() + "\n" + todoList.getText().toString() );
             isEditing = false;
         });
-
-        Button cancelbtn = (Button) findViewById(R.id.cancelBtnEdit);
-        cancelbtn.setOnClickListener(v -> {
-            finish();
-        });
-
-
-        setToDolistActionEvent();
+        Button cancelBtn = findViewById(R.id.cancelBtnEdit);
+        cancelBtn.setOnClickListener(v -> finish());
+        setToDoListActionEvent();
 
 
     }
 
-    private void setToDolistActionEvent(){
-        todolist.setImeOptions(EditorInfo.IME_ACTION_DONE);
-        todolist.setRawInputType(InputType.TYPE_CLASS_TEXT);
-        todolist.setOnEditorActionListener((v, actionId, event) -> {
+    private void getIntentData() {
+        intentToDoResponse = (TodoResponse) getIntent().getSerializableExtra(PASSED_TODO);
+        loggedUser = (User) getIntent().getSerializableExtra(LOGGED_USER_KEY);
+    }
+
+    private void getUIElements() {
+        todoList = findViewById(R.id.listDisplayEdit);
+        userSharedWith = findViewById(R.id.editShared);
+        editTextInfo = findViewById(R.id.textInfoEdit);
+        title = findViewById(R.id.textTitle);
+    }
+
+    private void setToDoListActionEvent(){
+        todoList.setImeOptions(EditorInfo.IME_ACTION_DONE);
+        todoList.setRawInputType(InputType.TYPE_CLASS_TEXT);
+        todoList.setOnEditorActionListener((v, actionId, event) -> {
             if (actionId == EditorInfo.IME_ACTION_DONE){
-                int start = Math.max(todolist.getSelectionStart(), 0);
-                int end = Math.max(todolist.getSelectionEnd(), 0);
-                todolist.getText().replace(Math.min(start, end), Math.max(start, end),
+                int start = Math.max(todoList.getSelectionStart(), 0);
+                int end = Math.max(todoList.getSelectionEnd(), 0);
+                todoList.getText().replace(Math.min(start, end), Math.max(start, end),
                         "\n + ", 0, "\n + ".length());
                 APIInstance.updateTodoByID(this,loggedUser.getUsername(),loggedUser.getPassword()
-                        ,Integer.parseInt(intentToDoResponse.getId()), userSharedwith.getText() + "\n" + todolist.getText().toString() );
+                        ,Integer.parseInt(intentToDoResponse.getId()), userSharedWith.getText() + "\n" + todoList.getText().toString() );
                 isEditing = false;
             }
             System.out.println(actionId);
@@ -91,12 +88,12 @@ public class EditActivity extends BaseActivity {
         if(totalString.contains("\n")){
             String[] result = totalString.split("\n", 2);
             String ownerString = result[0];
-            String todosString = result[1];
-            userSharedwith.setText(ownerString);
-            todolist.setText(todosString);
+            String todoString = result[1];
+            userSharedWith.setText(ownerString);
+            todoList.setText(todoString);
         }else{
-            userSharedwith.setText("");
-            todolist.setText(totalString);
+            userSharedWith.setText("");
+            todoList.setText(totalString);
         }
     }
 
@@ -112,14 +109,12 @@ public class EditActivity extends BaseActivity {
     protected void onPause() {
         super.onPause();
         isPaused = true;
-        System.out.println("on Pause: "+ isPaused);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
         isPaused = false;
-        System.out.println("on resume: "+ isPaused);
         if(!isEditing){
             updateView();
         }
@@ -127,13 +122,10 @@ public class EditActivity extends BaseActivity {
     }
 
     private void automateUpdateView(){
-        // Create the Handler object (on the main thread by default)
         handler = new Handler();
-        // Define the code block to be executed
         runnableCode = new Runnable() {
             @Override
             public void run() {
-                // Do something here on the main thread
                 if(!isEditing && !isPaused){
                     System.out.println("not editing and not paused the text has been updated");
                     updateView();
@@ -158,17 +150,11 @@ public class EditActivity extends BaseActivity {
 
             @Override
             public void afterTextChanged(Editable s) {
-                if( todolist.getTag() == null ) {
-                    isEditing = true;
-                    // Value changed by user
-                }else {
-                    isEditing = false;
-                    // Value changed by program
-                }
+                isEditing = todoList.getTag() == null;
             }
 
         };
-        todolist.addTextChangedListener(textWatcher);
+        todoList.addTextChangedListener(textWatcher);
     }
 
     protected void updateView(){
@@ -178,16 +164,16 @@ public class EditActivity extends BaseActivity {
                     if(totalString.contains("\n")){
                         String[] result = totalString.split("\n", 2);
                         String ownerString = result[0];
-                        String todosString = result[1];
-                        todolist.setTag( "PRG_CHANGED" );
-                        userSharedwith.setText(ownerString);
-                        todolist.setText(todosString);
-                        todolist.setTag(null);
+                        String todoString = result[1];
+                        todoList.setTag( "PRG_CHANGED" );
+                        userSharedWith.setText(ownerString);
+                        todoList.setText(todoString);
+                        todoList.setTag(null);
                     }else{
-                        todolist.setTag( "PRG_CHANGED" );
-                        userSharedwith.setText("");
-                        todolist.setText(totalString);
-                        todolist.setTag(null);
+                        todoList.setTag( "PRG_CHANGED" );
+                        userSharedWith.setText("");
+                        todoList.setText(totalString);
+                        todoList.setTag(null);
                     }
                 });
     }

@@ -1,33 +1,17 @@
 package com.supinfo.and.suptodo;
 
 import android.content.Intent;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
-import android.text.InputType;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.ListAdapter;
 import android.widget.ListView;
-import android.widget.Button;
-import android.widget.Toast;
 
 import com.supinfo.and.suptodo.SQLITE.User;
 import com.supinfo.and.suptodo.model.TodoResponse;
 import com.supinfo.and.suptodo.model.UserResponse;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
 public class ToDoListActivity extends BaseActivity {
 
@@ -37,19 +21,7 @@ public class ToDoListActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_to_do_list);
         loggedUser = (UserResponse) getIntent().getSerializableExtra(LOGGED_USER_KEY);
-
-
         refreshListViewFromAPI();
-
-        ListView multiListView = (ListView)findViewById(R.id.multiListView);
-
-
-        multiListView.setOnItemClickListener((parent, view, position, id) -> {
-            view.setSelected(true);
-            TodoResponse mTodoResponse = (TodoResponse) parent.getItemAtPosition(position);
-            Toast.makeText(getBaseContext(),"id selected is " + mTodoResponse.getId(),Toast.LENGTH_LONG).show();
-        });
-
     }
 
     @Override
@@ -60,23 +32,19 @@ public class ToDoListActivity extends BaseActivity {
 
     private void refreshListViewFromAPI() {
         APIInstance.listFromAPI(this,loggedUser.getUsername(), loggedUser.getPassword(), todoResponses -> {
-            ListView multiListView = (ListView) findViewById(R.id.multiListView);
+            ListView multiListView = findViewById(R.id.multiListView);
             ToDoItemAdapter multiListViewAdapter = new ToDoItemAdapter(this,todoResponses);
             multiListView.setAdapter(multiListViewAdapter);
         });
-        ListView multiListView = (ListView)findViewById(R.id.multiListView);
+        ListView multiListView = findViewById(R.id.multiListView);
+        multiListView.setOnItemClickListener((parent, view, position, id) -> openEditActivity((TodoResponse) parent.getItemAtPosition(position)));
 
-
-        multiListView.setOnItemClickListener((parent, view, position, id) -> {
-            openEditActivity((TodoResponse) parent.getItemAtPosition(position));
-        });
-
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
         setTitle("ID: " + loggedUser.getId() + " Username: " + loggedUser.getUsername() );
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        FloatingActionButton fab = findViewById(R.id.fab);
         fab.setOnClickListener(view -> {
             if(multiListView.getAdapter().getCount()==50){
                fab.setActivated(false);
@@ -89,19 +57,13 @@ public class ToDoListActivity extends BaseActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_to_do_list, menu);
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
         if (id == R.id.action_logout) {
             System.out.println("logout pressed");
             logoutAndCloseActivity();

@@ -1,20 +1,10 @@
 package com.supinfo.and.suptodo;
 
 import android.content.Intent;
-import android.os.AsyncTask;
-import android.os.PersistableBundle;
-import android.support.annotation.Nullable;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-
 import com.supinfo.and.suptodo.API.CompletionHandlers;
 import com.supinfo.and.suptodo.SQLITE.User;
-import com.supinfo.and.suptodo.SQLITE.UserDao;
-import com.supinfo.and.suptodo.SQLITE.UserRoomDatabase;
-
-import java.lang.ref.WeakReference;
 import java.util.concurrent.ExecutionException;
-
 public class LaunchActivity extends BaseActivity {
 
     @Override
@@ -41,9 +31,7 @@ public class LaunchActivity extends BaseActivity {
                 }
             });
 
-        } catch (ExecutionException e) {
-            e.printStackTrace();
-        } catch (InterruptedException e) {
+        } catch (ExecutionException | InterruptedException e) {
             e.printStackTrace();
         }
 

@@ -1,37 +1,18 @@
 package com.supinfo.and.suptodo;
 
-import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
-import android.os.AsyncTask;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.widget.Toast;
-
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
 import com.supinfo.and.suptodo.API.APICallHandler;
-import com.supinfo.and.suptodo.API.ApiUtil;
-import com.supinfo.and.suptodo.API.UserService;
 import com.supinfo.and.suptodo.SQLITE.DeleteAllCompletionHandler;
 import com.supinfo.and.suptodo.SQLITE.GetUserCompletionHandler;
 import com.supinfo.and.suptodo.SQLITE.SQLITEAsyncTasks;
 import com.supinfo.and.suptodo.SQLITE.User;
 import com.supinfo.and.suptodo.SQLITE.UserDao;
 import com.supinfo.and.suptodo.SQLITE.UserRoomDatabase;
-import com.supinfo.and.suptodo.model.MessageResponse;
-import com.supinfo.and.suptodo.model.StateResponse;
-import com.supinfo.and.suptodo.model.TodoResponse;
-import com.supinfo.and.suptodo.model.UserResponse;
-
-import java.lang.ref.WeakReference;
-import java.util.List;
 import java.util.concurrent.ExecutionException;
-
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
 public class BaseActivity extends AppCompatActivity {
     ProgressDialog progressDialog;
@@ -45,14 +26,17 @@ public class BaseActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_base);
+        initProgressDialog();
+        UserRoomDatabase db = UserRoomDatabase.getDatabase(this.getApplication());
+        userDao = db.userDao();
+    }
+
+    private void initProgressDialog() {
         progressDialog = new ProgressDialog(this);
         progressDialog.setIndeterminate(true);
         progressDialog.setMessage("loading...");
         progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
         progressDialog.setCancelable(false);
-
-        UserRoomDatabase db = UserRoomDatabase.getDatabase(this.getApplication());
-        userDao = db.userDao();
     }
 
     public void showProgressDialog(String withText) {
@@ -89,12 +73,8 @@ public class BaseActivity extends AppCompatActivity {
         startActivity(new Intent(this, RegisterActivity.class));
     }
 
-    public void startLoginActivity(){
-        startActivity(new Intent(this, LoginActivity.class));
-    }
-
-    User getCachedUser(GetUserCompletionHandler getUserCompletionHandler) throws ExecutionException, InterruptedException{
-        return new SQLITEAsyncTasks.GetCachedUserAsyncTask(userDao,getUserCompletionHandler).execute().get();
+    void getCachedUser(GetUserCompletionHandler getUserCompletionHandler) throws ExecutionException, InterruptedException{
+        new SQLITEAsyncTasks.GetCachedUserAsyncTask(userDao, getUserCompletionHandler).execute().get();
     }
 
     public void insert (User user) {
@@ -102,11 +82,5 @@ public class BaseActivity extends AppCompatActivity {
     }
 
     public void deleteAll(DeleteAllCompletionHandler deleteAllCompletionHandler){ new SQLITEAsyncTasks.DeleteAllAsyncTask(userDao,deleteAllCompletionHandler).execute(); }
-
-
-
-
-
-
 
 }

@@ -1,7 +1,6 @@
 package com.supinfo.and.suptodo;
 
 import android.content.Context;
-import android.graphics.Color;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
@@ -9,22 +8,19 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.ImageView;
 import android.widget.TextView;
-import com.supinfo.and.suptodo.R;
 
 import com.supinfo.and.suptodo.model.TodoResponse;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class ToDoItemAdapter extends ArrayAdapter<TodoResponse> {
 
     private List<TodoResponse> todoResponses;
-    LayoutInflater layoutInflater;
-    Context mContext;
+    private LayoutInflater layoutInflater;
+    private Context mContext;
 
-    public ToDoItemAdapter(@NonNull Context context, @NonNull List<TodoResponse> objects) {
+    ToDoItemAdapter(@NonNull Context context, @NonNull List<TodoResponse> objects) {
         super(context, R.layout.todo_list_item, objects);
         todoResponses = objects;
         layoutInflater = LayoutInflater.from(context);
@@ -39,9 +35,9 @@ public class ToDoItemAdapter extends ArrayAdapter<TodoResponse> {
             convertView = layoutInflater.inflate(R.layout.todo_list_item,parent,false);
         }
 
-        TextView ownerOfTodoText = (TextView) convertView.findViewById(R.id.owner_of_todo);
-        TextView todoText = (TextView) convertView.findViewById(R.id.todo_text);
-        TextView isShared = (TextView) convertView.findViewById(R.id.isShared);
+        TextView ownerOfTodoText = convertView.findViewById(R.id.owner_of_todo);
+        TextView todoText = convertView.findViewById(R.id.todo_text);
+        TextView isShared = convertView.findViewById(R.id.isShared);
 
         TodoResponse todoResponse = todoResponses.get(position);
         String totalString = todoResponse.getTodo();
@@ -65,11 +61,11 @@ public class ToDoItemAdapter extends ArrayAdapter<TodoResponse> {
         if(todoResponse.getUserinvited() == null){
 
             isShared.setTextColor(ContextCompat.getColor(mContext, R.color.colorAccent));
-            isShared.setText("Private");
-            ownerOfTodoText.setText("My Private ToDo");
+            isShared.setText(R.string.PrivateText);
+            ownerOfTodoText.setText(R.string.PrivateTodoTitle);
         }else{
             isShared.setTextColor(ContextCompat.getColor(mContext, R.color.colorPrimaryDark));
-            isShared.setText("Shared");
+            isShared.setText(R.string.SharedText);
         }
 
         return convertView;

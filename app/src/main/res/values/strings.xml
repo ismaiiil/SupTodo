@@ -21,4 +21,25 @@
     <string name="title_activity_register">Register</string>
     <string name="title_activity_launch">SUPTodo</string>
     <string name="title_activity_todolist">Your Todo Lists</string>
+    <string name="EditPrivateTODOInfo">Your Private Todo List:</string>
+    <string name="PrivateText">Private</string>
+    <string name="PrivateTodoTitle">My Private ToDo</string>
+    <string name="SharedText">Shared</string>
+    <string name="btnAddText">Add</string>
+    <string name="btnCancelText">Cancel</string>
+    <string name="defaultEditTitle">The shared To Do List:</string>
+    <string name="textfieldTitletext">Title</string>
+    <string name="BtnUpdateText">Update</string>
+    <string name="BtnBackText">Back</string>
+    <string name="loginText">Login</string>
+    <string name="register_insteadText">Register instead?</string>
+    <string name="registerText">Register</string>
+    <string name="login_insteadText">login instead?</string>
+    <string name="firstnameText">FirstName</string>
+    <string name="passwordText">Password</string>
+    <string name="usernameText">UserName</string>
+    <string name="lastnameText">LastName</string>
+    <string name="e_mailText">E-mail</string>
+    <string name="addTextInfo">Username of user you want to share this with:</string>
+    <string name="shared_userEditText">Shared User</string>
 </resources>
